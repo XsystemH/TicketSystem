@@ -199,7 +199,7 @@ private:
     return result;
   }
 
-  int dfs(INDEX index, VALUE value, vector<std::pair<int, int>> &road) {
+  int dfs_for_insert(INDEX index, VALUE value, vector<std::pair<int, int>> &road) {
     node n = readn(road[road.size() - 1].second);
     bool flag = false;
     int i;
@@ -219,7 +219,7 @@ private:
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
-        int ip = dfs(index, value, road);
+        int ip = dfs_for_insert(index, value, road);
         if (ip != -1) return ip;
         else road.pop_back();
       }
@@ -233,7 +233,7 @@ private:
     }
     else {
       road.push_back(std::make_pair(i,n.sons[i]));
-      int ip = dfs(index, value, road);
+      int ip = dfs_for_insert(index, value, road);
       if (ip != -1) return ip;
       else road.pop_back();
     }
@@ -268,7 +268,7 @@ private:
 
     vector<std::pair<int, int>> road;
     road.push_back(std::make_pair(0, root));
-    int ip = dfs(index, value, road);
+    int ip = dfs_for_insert(index, value, road);
     if (ip == -1) {
       node n = readn(root);
       while (!n.type) {
@@ -527,8 +527,233 @@ private:
     }
   }
 
-  void erase_AUX(INDEX index, VALUE value) {
+  int dfs_for_erase(INDEX index, VALUE value, vector<std::pair<int, int>> &road) {
+    node n = readn(road[road.size() - 1].second);
+    bool flag = false;
+    int i;
+    for (i = 0; i < n.size - 1; ++i) {
+      if (index > n.keys[i]) {
+        continue;
+      }
+      if (n.keys[i] > index) {
+        if (flag) break;
+        else flag = true;
+      }
+      if (n.type) {
+        info in = readi(n.sons[i]);
+        if (in.vals[0].first > index || (in.vals[0].first == index && in.vals[0].second > value)) continue;
+        if (in.vals[in.size - 1].first < index || (in.vals[in.size - 1].first == index && in.vals[in.size - 1].second < value)) continue;
+        for (int j = 0; j < in.size; ++j) {
+          if (in.vals[j].first == index && in.vals[j].second == value) {
+            road.push_back(std::make_pair(i, n.sons[i]));
+            return j;
+          }
+        }
+      }
+      else {
+        road.push_back(std::make_pair(i,n.sons[i]));
+        int ip = dfs_for_erase(index, value, road);
+        if (ip != -1) return ip;
+        else road.pop_back();
+      }
+    } // for
+    //last son i = n.size - 1
+    if (n.type) {
+      info in = readi(n.sons[i]);
+      if (in.vals[0].first > index || (in.vals[0].first == index && in.vals[0].second > value)) return -1;
+      if (in.vals[in.size - 1].first < index || (in.vals[in.size - 1].first == index && in.vals[in.size - 1].second < value)) return -1;
+      for (int j = 0; j < in.size; ++j) {
+        if (in.vals[j].first == index && in.vals[j].second == value) {
+          road.push_back(std::make_pair(i, n.sons[i]));
+          return j;
+        }
+      }
+    }
+    else {
+      road.push_back(std::make_pair(i,n.sons[i]));
+      int ip = dfs_for_erase(index, value, road);
+      if (ip != -1) return ip;
+      else road.pop_back();
+    }
+    return -1;
+  }
 
+  void erase_AUX(INDEX index, VALUE value) {
+    if (root == 0) return;
+    vector<std::pair<int, int>> road;
+    road.push_back(std::make_pair(0, root));
+    int ip = dfs_for_insert(index, value, road);
+    if (ip == -1) {
+      return;
+    }
+    int ptr = road.size() - 1;
+
+    info in = readi(road[ptr].second);
+    if (in.size > L / 2) { // case 1: INFO.size > L / 2
+      for (int i = ip; i < in.size - 1; ++i) in.vals[i] = in.vals[i + 1];
+      in.size--;
+      writei(road[ptr].second, in);
+      return;
+    }
+    node n = readn(road[ptr - 1].second);
+
+    bool flag = true;
+    if (road[ptr].first != 0) { // has left sibling
+      info il = readi(n.sons[road[ptr].first - 1]); // il is in's left
+      if (il.size > L / 2) { // borrow
+        for (int i = ip; i > 0; --i) {
+          in.vals[i] = in.vals[i - 1];
+        }
+        in.vals[0] = il.vals[il.size - 1];
+        il.size--;
+        n.keys[road[ptr].first - 1] = in.vals[0].first;
+        writei(n.sons[road[ptr].first - 1], il);
+        writei(road[ptr].second, in);
+        writen(road[ptr - 1].second, n);
+        return;
+      }
+      if (il.size == L / 2) { // merge
+        for (int i = 0; i < L / 2; ++i) {
+          if (i == ip) continue;
+          il.vals[il.size++] = in.vals[i];
+        }
+        writei(n.sons[road[ptr].first - 1], il);
+        for (int i = road[ptr].first - 1; i < n.size; ++i) {
+          n.keys[i] = n.keys[i + 1];
+          n.sons[i] = n.sons[i + 1];
+        }
+        n.size--;
+        if (n.size >= M / 2 || road.size() == 2) {
+          writen(road[ptr - 1].second, n);
+          return;
+        }
+        flag = false;
+        // n need merge or borrow
+      }
+    }
+    if (flag && road[ptr].first < n.size - 1) { // has right sibling
+      info ir = readi(n.sons[road[ptr].first + 1]);
+      if (ir.size > L / 2) { // borrow
+        for (int i = ip; i < in.size - 1; ++i) {
+          in.vals[i] = in.vals[i + 1];
+        }
+        in.vals[in.size - 1] = ir.vals[0];
+        ir.size--;
+        for (int i = 0; i < ir.size; ++i) {
+          ir.vals[i] = ir.vals[i + 1];
+        }
+        n.keys[road[ptr].first] = ir.vals[0].first;
+        writei(n.sons[road[ptr].first + 1], ir);
+        writei(road[ptr].second, in);
+        writen(road[ptr - 1].second, n);
+        return;
+      }
+      if (ir.size == L / 2) { // merge
+        for (int i = ip; i < in.size - 1; ++i) {
+          in.vals[i] = in.vals[i + 1];
+        }
+        in.size--;
+        for (int i = 0; i < ir.size; ++i) {
+          in.vals[in.size++] = ir.vals[i];
+        }
+        writei(road[ptr].second, in);
+        for (int i = road[ptr].first; i < n.size; ++i) {
+          n.keys[i] = n.keys[i + 1];
+          n.sons[i] = n.sons[i + 1];
+        }
+        n.size--;
+        if (n.size >= M / 2 || road.size() == 2) {
+          writen(road[ptr - 1].second, n);
+          return;
+        }
+        // n need merge or borrow
+      }
+    }
+
+    // n
+    ptr--;
+    node ns = n;
+    while (ptr > 0) {
+      flag = true;
+      n = readn(road[ptr - 1].second);
+      if (road[ptr].first != 0) { // ns has left sibling
+        node nl = readn(n.sons[road[ptr].first - 1]);
+        if (nl.size > M / 2) {
+          for (int i = ns.size; i > 0; --i) {
+            ns.keys[i] = ns.keys[i - 1];
+            ns.sons[i] = ns.sons[i - 1];
+          }
+          ns.sons[0] = nl.sons[nl.size - 1];
+          ns.keys[0] = n.keys[road[ptr].first - 1];
+          n.keys[road[ptr].first - 1] = nl.keys[nl.size - 1];
+          ns.size++;
+          nl.size--;
+          writen(n.sons[road[ptr].first - 1], nl);
+          writen(road[ptr].second, ns);
+          writen(road[ptr - 1].second, n);
+          return;
+        }
+        if (nl.size == M / 2) {
+          for (int i = 0; i < ns.size; ++i) {
+            nl.keys[nl.size] = ns.keys[i];
+            nl.sons[nl.size] = ns.sons[i];
+            nl.size++;
+          }
+          writen(n.sons[road[ptr].first - 1], nl);
+          for (int i = road[ptr].first; i < n.size - 1; ++i) {
+            n.keys[i] = n.keys[i + 1];
+            n.sons[i] = n.sons[i + 1];
+          }
+          n.size--;
+          if (n.size >= M / 2) {
+            writen(road[ptr - 1].second, n);
+            return;
+          }
+          flag = false;
+        }
+      }
+      if (flag && road[ptr].first < n.size - 1) {
+        node nr = readn(n.sons[road[ptr].first + 1]);
+        if (nr.size > M / 2) {
+          ns.keys[ns.size] = n.keys[road[ptr].first];
+          ns.sons[ns.size] = nr.sons[0];
+          ns.size++;
+          n.keys[road[ptr].first] = nr.keys[0];
+          for (int i = 0; i < nr.size - 1; ++i) {
+            nr.keys[i] = nr.keys[i + 1];
+            nr.sons[i] = nr.sons[i + 1];
+          }
+          nr.size--;
+          writen(n.sons[road[ptr].first + 1], nr);
+          writen(road[ptr].second, ns);
+          writen(road[ptr - 1].second, n);
+          return;
+        }
+        if (nr.size == M / 2) {
+          for (int i = 0; i < nr.size; ++i) {
+            ns.keys[ns.size] = nr.keys[i];
+            ns.sons[ns.size] = nr.sons[i];
+            ns.size++;
+          }
+          writen(road[ptr].second, ns);
+          for (int i = road[ptr].first + 1; i < n.size - 1; ++i) {
+            n.keys[i] = n.keys[i + 1];
+            n.sons[i] = n.sons[i + 1];
+          }
+          n.sons--;
+          if (n.size >= M / 2) {
+            writen(road[ptr - 1].second, n);
+            return;
+          }
+        }
+      }
+      ns = n;
+      ptr--;
+    }
+    // ptr = 0, n = root
+    if (n.size == 1) {
+      renewroot(road[1].second);
+    }
   }
 
 public:
