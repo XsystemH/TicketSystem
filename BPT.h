@@ -532,7 +532,7 @@ private:
           il.vals[il.size++] = in.vals[i];
         }
         writei(n.sons[road[ptr].first - 1], il);
-        for (int i = road[ptr].first - 1; i < n.size; ++i) {
+        for (int i = road[ptr].first; i < n.size - 1; ++i) {
           n.keys[i] = n.keys[i + 1];
           n.sons[i] = n.sons[i + 1];
         }
@@ -571,7 +571,7 @@ private:
           in.vals[in.size++] = ir.vals[i];
         }
         writei(road[ptr].second, in);
-        for (int i = road[ptr].first; i < n.size; ++i) {
+        for (int i = road[ptr].first + 1; i < n.size - 1; ++i) {
           n.keys[i] = n.keys[i + 1];
           n.sons[i] = n.sons[i + 1];
         }
@@ -681,7 +681,7 @@ public:
   }
 
   void erase(INDEX index, VALUE value) {
-//    erase_AUX(index, value);
+    erase_AUX(index, value);
   }
 
   vector<VALUE> find(INDEX index) {
