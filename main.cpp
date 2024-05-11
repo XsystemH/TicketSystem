@@ -31,6 +31,7 @@ int main() {
       s.insert(hash(index), value);
     }
     else if (opt == "delete") {
+      std::cout << "D";
       std::cin >> index >> value;
       s.erase(hash(index), value);
     }
