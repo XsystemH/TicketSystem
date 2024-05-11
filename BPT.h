@@ -654,7 +654,7 @@ private:
             n.keys[i] = n.keys[i + 1];
             n.sons[i] = n.sons[i + 1];
           }
-          n.sons--;
+          n.size--;
           if (n.size >= M / 2) {
             writen(road[ptr - 1].second, n);
             return;
@@ -681,7 +681,7 @@ public:
   }
 
   void erase(INDEX index, VALUE value) {
-    // todo
+    erase_AUX(index, value);
   }
 
   vector<VALUE> find(INDEX index) {
