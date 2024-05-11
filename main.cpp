@@ -5,7 +5,7 @@
 #include "BPT.h"
 
 #define K 233
-#define MOD 1000000007
+#define MOD 1000000000000000007 // 18
 
 BPT<unsigned long long, int> s;
 
