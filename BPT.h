@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 40
-#define L 40
+#define M 16
+#define L 128
 
 template<class INDEX, class VALUE>
 class BPT {
