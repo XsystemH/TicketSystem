@@ -4,7 +4,7 @@
 #include <vector>
 #include "BPT.h"
 
-#define K 17
+#define K 23
 
 BPT<unsigned long long, int> s;
 
