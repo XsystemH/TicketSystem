@@ -526,7 +526,7 @@ private:
         writen(road[ptr - 1].second, n);
         return;
       }
-      if (il.size == L / 2) { // merge
+      else { // if (il.size == L / 2) merge
         for (int i = 0; i < L / 2; ++i) {
           if (i == ip) continue;
           il.vals[il.size++] = in.vals[i];
@@ -563,7 +563,7 @@ private:
         writen(road[ptr - 1].second, n);
         return;
       }
-      if (ir.size == L / 2) { // merge
+      else { // if (ir.size == L / 2) merge
         for (int i = ip; i < in.size - 1; ++i) {
           in.vals[i] = in.vals[i + 1];
         }
