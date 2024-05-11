@@ -30,8 +30,6 @@ private:
     int sons[M];
     int size = 0;
     bool type = false; // 0 node, 1 leaf
-
-    INDEX minn;
   };
 
   struct info {
@@ -240,14 +238,13 @@ private:
     return -1;
   }
 
-  void higher(int pos, node n1, node n2) {
+  void higher(int pos, node n1, node n2, INDEX key) {
     node nr;
     nr.size = 2;
     nr.type = false;
     nr.sons[0] = pos;
     nr.sons[1] = writen(n2);
-    nr.keys[0] = n2.minn;
-    nr.minn = n1.minn;
+    nr.keys[0] = key;
     renewroot(writen(nr));
   }
 
@@ -261,7 +258,6 @@ private:
       i.vals[i.size++] = std::make_pair(index, value); // 2
       n.sons[0] = writei(i);
       n.keys[0] = index; // 3
-      n.minn = index;
       renewroot(writen(n)); // 4
       return;
     }
@@ -299,30 +295,10 @@ private:
         flag = true;
       }
       writei(n.sons[ip], ni);
-      if (flag) {
-        if (ip == 0) {
-          n.minn = index;
-          writen(road[ptr--].second, n);
-          while (ptr >= 0) {
-            n = readn(road[ptr].second);
-            if (road[ptr + 1].first == 0) {
-              n.minn = index;
-              writen(road[ptr].second, n);
-              ptr--;
-            }
-            else {
-              n.keys[ip - 1] = index;
-              writen(road[ptr--].second, n);
-              break;
-            }
-          }
-        }
-        else {
-          n.keys[ip - 1] = index;
-          writen(road[ptr--].second, n);
-        }
+      if (flag && ip != 0) {
+        n.keys[ip - 1] = index;
+        writen(road[ptr--].second, n);
       }
-
       return;
     }
 
@@ -358,26 +334,6 @@ private:
       n.keys[ip] = i2.vals[0].first;
       n.sons[ip + 1] = writei(i2);
       n.size++;
-
-      if (ip == 0 && i1.vals[0].first < n.minn) {
-        n.minn = index;
-        writen(road[ptr--].second, n);
-        while (ptr >= 0) {
-          n = readn(road[ptr].second);
-          if (road[ptr + 1].first == 0) {
-            n.minn = index;
-            writen(road[ptr].second, n);
-            ptr--;
-          }
-          else {
-            n.keys[ip - 1] = index;
-            writen(road[ptr--].second, n);
-            break;
-          }
-        }
-        return;
-      }
-
       writen(road[ptr].second, n);
       return;
     }
@@ -385,20 +341,22 @@ private:
     node n1, n2;
     t = M - 1;
     flag = true;
+    INDEX key;
     for (int i = M / 2 - 1; i >= 0; --i) {
       if (flag && t == ip) {
         n2.sons[i] = writei(i2);
         if (i) n2.keys[i - 1] = i2.vals[0].first;
+        else key = i2.vals[0].first;
         flag = false;
         continue;
       }
       n2.sons[i] = n.sons[t];
       if (i) n2.keys[i - 1] = n.keys[t - 1];
+      else key = n.keys[t - 1];
       t--;
     }
     n2.size = M / 2;
     n2.type = n.type;
-    n2.minn = readi(n2.sons[0]).vals[0].first;
     for (int i = M / 2; i >= 0; --i) {
       if (flag && t == ip) {
         n1.sons[i] = writei(i2);
@@ -412,77 +370,34 @@ private:
     }
     n1.size = M / 2 + 1;
     n1.type = n.type;
-    n1.minn = readi(n1.sons[0]).vals[0].first;
-
-    if (road[ptr].first == 0 && n1.minn < n.minn) {
-      n.minn = index;
-      writen(road[ptr--].second, n);
-      while (ptr >= 0) {
-        n = readn(road[ptr].second);
-        if (road[ptr + 1].first == 0) {
-          n.minn = index;
-          writen(road[ptr].second, n);
-          ptr--;
-        }
-        else {
-          n.keys[ip - 1] = index;
-          writen(road[ptr--].second, n);
-          break;
-        }
-      }
-      return;
-    }
-
     writen(road[ptr].second, n1);
 
     if (ptr > 0) ptr--; // road.pop_back();
     else {
-      higher(road[ptr].second, n1, n2);
+      higher(road[ptr].second, n1, n2, key);
       ptr--;
     }
 
+    INDEX nKEY;
     while(ptr >= 0) {
       n = readn(road[ptr].second);
       if (n.size < M) { // case3
         node nn;
         nn.size = n.size + 1;
         t = n.size;
-        flag = false;
         for (int i = n.size - 1; i >= 0; --i) {
           if (i == road[ptr + 1].first) {
-            nn.keys[t - 1] = n2.minn;
+            nn.keys[t - 1] = key;
             nn.sons[t] = writen(n2);
             t--;
-            if (i == 0) flag = true;
           }
           if (i) nn.keys[t - 1] = n.keys[i - 1];
           nn.sons[t] = n.sons[i];
           t--;
         }
-
-        if (flag) {
-          n.minn = index;
-          writen(road[ptr--].second, n);
-          while (ptr >= 0) {
-            n = readn(road[ptr].second);
-            if (road[ptr + 1].first == 0) {
-              n.minn = index;
-              writen(road[ptr].second, n);
-              ptr--;
-            }
-            else {
-              n.keys[ip - 1] = index;
-              writen(road[ptr--].second, n);
-              break;
-            }
-          }
-          return;
-        }
-
-        nn.minn = readn(n.sons[0]).minn;
         writen(road[ptr].second, nn);
         return;
-      }
+      } // < M
 
       t = M - 1;
       flag = true;
@@ -490,14 +405,14 @@ private:
       for (int i = M / 2 - 1; i >= 0; --i) {
         if (flag && t == road[ptr + 1].first) {
           n2.sons[i] = writen(temp);
-          if (i) n2.keys[i - 1] = temp.minn;
-          else n2.minn = temp.minn;
+          if (i) n2.keys[i - 1] = key;
+          else nKEY = key;
           flag = false;
           continue;
         }
         n2.sons[i] = n.sons[t];
         if (i) n2.keys[i - 1] = n.keys[t - 1];
-        else n2.minn = readn(n.sons[t]).minn;
+        else nKEY = n.keys[t - 1];
         t--;
       }
       n2.size = M / 2;
@@ -505,14 +420,12 @@ private:
       for (int i = M / 2; i >= 0; --i) {
         if (flag && t == road[ptr + 1].first) {
           n1.sons[i] = writen(temp);
-          if (i) n1.keys[i - 1] = temp.minn;
-          else n1.minn = temp.minn;
+          if (i) n1.keys[i - 1] = key;
           flag = false;
           continue;
         }
         n1.sons[i] = n.sons[t];
         if (i) n1.keys[i - 1] = n.keys[t - 1];
-        else n1.minn = n.minn; // t=0, so n.minn=n.sons[0].min
         t--;
       }
       n1.size = M / 2 + 1;
@@ -521,9 +434,10 @@ private:
 
       if (ptr > 0) ptr--; // road.pop_back();
       else {
-        higher(road[ptr].second, n1, n2);
+        higher(road[ptr].second, n1, n2, nKEY);
         ptr--; // road.pop_back();
       }
+      key = nKEY;
     }
   }
 
