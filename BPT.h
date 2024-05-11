@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 4
-#define L 4
+#define M 40
+#define L 40
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -202,19 +202,8 @@ private:
   int dfs(INDEX index, VALUE value, vector<std::pair<int, int>> &road) {
     node n = readn(road[road.size() - 1].second);
     bool flag = false;
-    int i = 0;
-    if (n.minn <= index && index <= n.keys[0]) {
-      if (n.type) { // leaf
-        return 0;
-      }
-      else { // node
-        road.push_back(std::make_pair(0, n.sons[0]));
-        int ip = dfs(index, value, road);
-        if (ip != -1) return ip;
-        else road.pop_back();
-      }
-    }
-    for (i = 1; i < n.size - 1; ++i) {
+    int i;
+    for (i = 0; i < n.size - 1; ++i) {
       if (index > n.keys[i]) {
         continue;
       }
@@ -224,12 +213,9 @@ private:
       }
       if (n.type) {
         info in = readi(n.sons[i]);
-        if (in.vals[0].first <= index) {
-          if (in.vals[in.size - 1].first > index) return i;
-          else if (in.vals[in.size - 1].first == index &&
-                   in.vals[in.size - 1].second > value) return i;
-        }
-        else return -1;
+        if (in.vals[in.size - 1].first > index) return i;
+        else if (in.vals[in.size - 1].first == index &&
+                 in.vals[in.size - 1].second > value) return i;
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
@@ -317,10 +303,18 @@ private:
         if (ip == 0) {
           n.minn = index;
           writen(road[ptr--].second, n);
-          while (ptr >= 0 && road[ptr + 1].first == 0) {
-            n = readn(road[--ptr].second);
-            n.minn = index;
-            writen(road[ptr].second, n);
+          while (ptr >= 0) {
+            n = readn(road[ptr].second);
+            if (road[ptr + 1].first == 0) {
+              n.minn = index;
+              writen(road[ptr].second, n);
+              ptr--;
+            }
+            else {
+              n.keys[ip - 1] = index;
+              writen(road[ptr--].second, n);
+              break;
+            }
           }
         }
         else {
@@ -350,8 +344,9 @@ private:
         flag = false;
         continue;
       }
-      i1.vals[i] = in.vals[t--];
+      if (t >= 0) i1.vals[i] = in.vals[t--];
     }
+    if (flag) i1.vals[0] = std::make_pair(index, value);
     i1.size = L / 2 + 1;
     writei(n.sons[ip], i1);
 
@@ -367,10 +362,18 @@ private:
       if (ip == 0 && i1.vals[0].first < n.minn) {
         n.minn = index;
         writen(road[ptr--].second, n);
-        while (ptr >= 0 && road[ptr + 1].first == 0) {
+        while (ptr >= 0) {
           n = readn(road[ptr].second);
-          n.minn = index;
-          writen(road[ptr].second, n);
+          if (road[ptr + 1].first == 0) {
+            n.minn = index;
+            writen(road[ptr].second, n);
+            ptr--;
+          }
+          else {
+            n.keys[ip - 1] = index;
+            writen(road[ptr--].second, n);
+            break;
+          }
         }
         return;
       }
@@ -414,10 +417,18 @@ private:
     if (road[ptr].first == 0 && n1.minn < n.minn) {
       n.minn = index;
       writen(road[ptr--].second, n);
-      while (ptr >= 0 && road[ptr + 1].first == 0) {
+      while (ptr >= 0) {
         n = readn(road[ptr].second);
-        n.minn = index;
-        writen(road[ptr].second, n);
+        if (road[ptr + 1].first == 0) {
+          n.minn = index;
+          writen(road[ptr].second, n);
+          ptr--;
+        }
+        else {
+          n.keys[ip - 1] = index;
+          writen(road[ptr--].second, n);
+          break;
+        }
       }
       return;
     }
@@ -452,10 +463,18 @@ private:
         if (flag) {
           n.minn = index;
           writen(road[ptr--].second, n);
-          while (ptr >= 0 && road[ptr + 1].first == 0) {
+          while (ptr >= 0) {
             n = readn(road[ptr].second);
-            n.minn = index;
-            writen(road[ptr].second, n);
+            if (road[ptr + 1].first == 0) {
+              n.minn = index;
+              writen(road[ptr].second, n);
+              ptr--;
+            }
+            else {
+              n.keys[ip - 1] = index;
+              writen(road[ptr--].second, n);
+              break;
+            }
           }
           return;
         }
@@ -506,6 +525,10 @@ private:
         ptr--; // road.pop_back();
       }
     }
+  }
+
+  void erase_AUX(INDEX index, VALUE value) {
+
   }
 
 public:
