@@ -313,16 +313,22 @@ private:
         flag = true;
       }
       writei(n.sons[ip], ni);
-
-      if (ip == 0 && flag) {
-        n.minn = index;
-        writen(road[ptr--].second, n);
-        while (ptr >= 0 && road[ptr + 1].first == 0) {
-          n = readn(road[--ptr].second);
+      if (flag) {
+        if (ip == 0) {
           n.minn = index;
-          writen(road[ptr].second, n);
+          writen(road[ptr--].second, n);
+          while (ptr >= 0 && road[ptr + 1].first == 0) {
+            n = readn(road[--ptr].second);
+            n.minn = index;
+            writen(road[ptr].second, n);
+          }
+        }
+        else {
+          n.keys[ip - 1] = index;
+          writen(road[ptr--].second, n);
         }
       }
+
       return;
     }
 
@@ -380,13 +386,11 @@ private:
       if (flag && t == ip) {
         n2.sons[i] = writei(i2);
         if (i) n2.keys[i - 1] = i2.vals[0].first;
-        n2.keys[i] = i2.vals[i2.size - 1].first;
         flag = false;
         continue;
       }
       n2.sons[i] = n.sons[t];
       if (i) n2.keys[i - 1] = n.keys[t - 1];
-      n2.keys[i] = n.keys[t];
       t--;
     }
     n2.size = M / 2;
@@ -396,13 +400,11 @@ private:
       if (flag && t == ip) {
         n1.sons[i] = writei(i2);
         if (i) n1.keys[i - 1] = i2.vals[0].first;
-        n1.keys[i] = i2.vals[i2.size - 1].first; ;
         flag = false;
         continue;
       }
       n1.sons[i] = n.sons[t];
       if (i) n1.keys[i - 1] = n.keys[t - 1];
-      n1.keys[i] = n.keys[t];
       t--;
     }
     n1.size = M / 2 + 1;
@@ -437,7 +439,7 @@ private:
         flag = false;
         for (int i = n.size - 1; i >= 0; --i) {
           if (i == road[ptr + 1].first) {
-            nn.keys[t - 1] = readi(n2.sons[0]).vals[0].first;
+            nn.keys[t - 1] = n2.minn;
             nn.sons[t] = writen(n2);
             t--;
             if (i == 0) flag = true;
