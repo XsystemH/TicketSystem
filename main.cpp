@@ -4,14 +4,15 @@
 #include <vector>
 #include "BPT.h"
 
-#define K 277
+#define K 233
+#define MOD 1000000007
 
 BPT<unsigned long long, int> s;
 
 unsigned long long hash(std::string &s) {
   unsigned long long ans = 0;
   for (char c : s) {
-    ans = ans * K + c;
+    ans = (ans * K + c) % MOD;
   }
   return ans;
 }
