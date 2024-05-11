@@ -681,7 +681,7 @@ public:
   }
 
   void erase(INDEX index, VALUE value) {
-    erase_AUX(index, value);
+//    erase_AUX(index, value);
   }
 
   vector<VALUE> find(INDEX index) {
