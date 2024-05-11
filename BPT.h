@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 128
-#define L 512
+#define M 160
+#define L 256
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -496,7 +496,7 @@ private:
     if (root == 0) return;
     vector<std::pair<int, int>> road;
     road.push_back(std::make_pair(0, root));
-    int ip = dfs_for_insert(index, value, road);
+    int ip = dfs_for_erase(index, value, road);
     if (ip == -1) {
       return;
     }
