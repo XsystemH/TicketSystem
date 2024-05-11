@@ -16,6 +16,7 @@ public:
     len = 0;
   }
   MyString(std::string s) {
+    len = 0;
     for (char c : s) {
       a[len++] = c;
     }
