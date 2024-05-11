@@ -8,7 +8,7 @@
 
 BPT<unsigned long long, int> s;
 
-unsigned long long hash(std::string s) {
+unsigned long long hash(std::string &s) {
   unsigned long long ans = 0;
   for (char c : s) {
     ans = ans * K + c;
@@ -31,7 +31,6 @@ int main() {
       s.insert(hash(index), value);
     }
     else if (opt == "delete") {
-      std::cout << "D";
       std::cin >> index >> value;
       s.erase(hash(index), value);
     }

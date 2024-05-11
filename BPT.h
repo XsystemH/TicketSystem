@@ -584,7 +584,20 @@ private:
       }
     }
 
-    // n
+    if (ptr == 1) {
+      for (int i = ip; i < in.size - 1; ++i) in.vals[i] = in.vals[i + 1];
+      in.size--;
+      writei(road[ptr].second, in);
+      if (in.size) return;
+      for (int i = road[ptr].first; i < n.size - 1; ++i) {
+        n.keys[i] = n.keys[i + 1];
+        n.sons[i] = n.sons[i + 1];
+      }
+      n.size--;
+      if (n.size == 0) renewroot(0);
+      return;
+    }
+
     ptr--;
     node ns = n;
     while (ptr > 0) {
@@ -692,6 +705,7 @@ public:
   }
 
   void test() {
+    if (root == 0) return;
     vector<int> ans;
     vector<int> stack;
     int t = 0, i;
