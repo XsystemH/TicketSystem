@@ -213,10 +213,15 @@ private:
       }
       if (n.type) {
         info in = readi(n.sons[i]);
-        if (in.vals[in.size - 1].first > index) return i;
-        else if (in.vals[in.size - 1].first == index &&
-                 in.vals[in.size - 1].second > value) return i;
-        else if (flag) return i; // index < n.keys[i]
+        if (i != 0) {
+          if (in.vals[0].first > index) return -1;
+          if (in.vals[0].first == index && in.vals[0].second > value) return -1;
+        }
+        if (flag) return i; // index < n.keys[i]
+        if (in.next == -1) return i;
+        info nxt = readi(in.next);
+        if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
+          return i;
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
@@ -229,10 +234,11 @@ private:
     if (i != n.size - 1) return -1;
     if (n.type) {
       info in = readi(n.sons[i]);
-      if (in.vals[in.size - 1].first > index) return i;
-      else if (in.vals[in.size - 1].first == index &&
-               in.vals[in.size - 1].second > value) return i;
-      else if (in.next == -1) return i;
+      if (i != 0) {
+        if (in.vals[0].first > index) return -1;
+        if (in.vals[0].first == index && in.vals[0].second > value) return -1;
+      }
+      if (in.next == -1) return i;
       info nxt = readi(in.next);
       if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
         return i;
@@ -400,6 +406,7 @@ private:
       if (n.size < M) { // case3
         node nn;
         nn.size = n.size + 1;
+        nn.type = n.type;
         t = n.size;
         for (int i = n.size - 1; i >= 0; --i) {
           if (i == road[ptr + 1].first) {
