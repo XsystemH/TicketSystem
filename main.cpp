@@ -4,7 +4,7 @@
 #include <vector>
 #include "BPT.h"
 
-#define K 277
+#define K 233
 
 class MyString {
 public:
@@ -59,12 +59,12 @@ public:
   }
 };
 
-BPT<MyString, int> s;
+BPT<unsigned long long, int> s;
 
 unsigned long long hash(std::string &s) {
   unsigned long long ans = 0;
   for (char c : s) {
-    ans = ans * K + c + 129;
+    ans = ans * K + c;
   }
   return ans;
 }
@@ -81,15 +81,15 @@ int main() {
     std::cin >> opt;
     if (opt == "insert") {
       std::cin >> index >> value;
-      s.insert(MyString(index), value);
+      s.insert(hash(index), value);
     }
     else if (opt == "delete") {
       std::cin >> index >> value;
-      s.erase(MyString(index), value);
+      s.erase(hash(index), value);
     }
     else if (opt == "find") {
       std::cin >> index;
-      vector<int> ans = s.find(MyString(index));
+      vector<int> ans = s.find(hash(index));
       if (!ans.empty()) for (int a : ans) {
         std::cout << a << " ";
       }

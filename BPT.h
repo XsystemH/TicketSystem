@@ -233,7 +233,7 @@ private:
       else if (in.vals[in.size - 1].first == index &&
                in.vals[in.size - 1].second > value) return i;
       else if (in.next == -1) return i;
-      info nxt = readi(in.next).vals[0].first;
+      info nxt = readi(in.next);
       if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
         return i;
     }
@@ -472,11 +472,16 @@ private:
         if (in.vals[0].first > index || (in.vals[0].first == index && in.vals[0].second > value)) continue;
         if (in.vals[in.size - 1].first < index || (in.vals[in.size - 1].first == index && in.vals[in.size - 1].second < value)) continue;
         for (int j = 0; j < in.size; ++j) {
-          if (in.vals[j].first == index && in.vals[j].second == value) {
-            road.push_back(std::make_pair(i, n.sons[i]));
-            return j;
+          if (in.vals[j].first >  index) return -1;
+          if (in.vals[j].first == index) {
+            if (in.vals[j].second >  value) return -1;
+            if (in.vals[j].second == value) {
+              road.push_back(std::make_pair(i, n.sons[i]));
+              return j;
+            }
           }
         }
+        return -1;
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
@@ -492,9 +497,13 @@ private:
       if (in.vals[0].first > index || (in.vals[0].first == index && in.vals[0].second > value)) return -1;
       if (in.vals[in.size - 1].first < index || (in.vals[in.size - 1].first == index && in.vals[in.size - 1].second < value)) return -1;
       for (int j = 0; j < in.size; ++j) {
-        if (in.vals[j].first == index && in.vals[j].second == value) {
-          road.push_back(std::make_pair(i, n.sons[i]));
-          return j;
+        if (in.vals[j].first >  index) return -1;
+        if (in.vals[j].first == index) {
+          if (in.vals[j].second >  value) return -1;
+          if (in.vals[j].second == value) {
+            road.push_back(std::make_pair(i, n.sons[i]));
+            return j;
+          }
         }
       }
     }
