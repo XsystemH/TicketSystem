@@ -206,7 +206,7 @@ private:
         continue;
       }
       if (n.keys[i] > index) {
-        if (flag) return -1;
+        if (flag) break;
         else flag = true;
       }
       if (n.type) {
@@ -223,6 +223,7 @@ private:
       }
     } // for
     //last son i = n.size - 1
+    if (i != n.size - 1) return -1;
     if (n.type) {
       info in = readi(n.sons[i]);
       if (in.vals[in.size - 1].first > index) return i;
@@ -474,6 +475,7 @@ private:
       }
     } // for
     //last son i = n.size - 1
+    if (i != n.size - 1) return -1;
     if (n.type) {
       info in = readi(n.sons[i]);
       if (in.vals[0].first > index || (in.vals[0].first == index && in.vals[0].second > value)) return -1;
