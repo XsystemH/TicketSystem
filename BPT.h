@@ -6,14 +6,14 @@
 #define TICKETSYSTEM_BPT_H
 
 #include <iostream>
-#include <vector> // 提交时记得换成“vector”
+#include "vector/vector.hpp" // 提交时记得换成“vector”
 #include <fstream>
 #include <string>
 #include <cstring>
 
 #include <iomanip> // 仅用于调试
 
-#define vector std::vector
+#define vector sjtu::vector
 #define M 160
 #define L 256
 

@@ -8,4 +8,6 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(code main.cpp
-        BPT.h)
+        BPT.h
+        vector/exceptions.hpp
+        vector/vector.hpp)
