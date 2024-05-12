@@ -709,10 +709,10 @@ private:
       }
       ns = n;
       ptr--;
-    }
+    } // while
     // ptr = 0, n = root
     if (n.size == 1) {
-      renewroot(road[1].second);
+      renewroot(n.sons[0]);
     }
   }
 
