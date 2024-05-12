@@ -716,6 +716,18 @@ private:
           writen(road[ptr - 1].second, n);
           return;
         }
+        for (int i = road[ptr + 1].first; i < ns.size - 1; ++i) {
+          ns.keys[i] = ns.keys[i + 1];
+          ns.sons[i] = ns.sons[i + 1];
+        }
+        ns.size--;
+        writen(road[ptr].second, ns); // if it has a sibling, won't get here
+        if (ns.size) return;
+        for (int i = road[ptr].first; i < n.size - 1; ++i) {
+          n.keys[i] = n.keys[i + 1];
+          n.sons[i] = n.sons[i + 1];
+        }
+        n.size--;
         if (n.size == 0) renewroot(0);
         else writen(road[ptr - 1].second, n);
         return;
