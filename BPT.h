@@ -206,7 +206,7 @@ private:
         continue;
       }
       if (n.keys[i] > index) {
-        if (flag) break;
+        if (flag) return -1;
         else flag = true;
       }
       if (n.type) {
