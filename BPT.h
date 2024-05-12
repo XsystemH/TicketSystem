@@ -35,6 +35,8 @@ private:
   struct info {
     std::pair<INDEX, VALUE> vals[L];
     int size = 0;
+
+    int next = -1;
   };
 
   void initialize() {
@@ -214,6 +216,7 @@ private:
         if (in.vals[in.size - 1].first > index) return i;
         else if (in.vals[in.size - 1].first == index &&
                  in.vals[in.size - 1].second > value) return i;
+        else if (flag) return i; // index < n.keys[i]
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
@@ -229,6 +232,10 @@ private:
       if (in.vals[in.size - 1].first > index) return i;
       else if (in.vals[in.size - 1].first == index &&
                in.vals[in.size - 1].second > value) return i;
+      else if (in.next == -1) return i;
+      info nxt = readi(in.next).vals[0].first;
+      if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
+        return i;
     }
     else {
       road.push_back(std::make_pair(i,n.sons[i]));
@@ -325,7 +332,7 @@ private:
     }
     if (flag) i1.vals[0] = std::make_pair(index, value);
     i1.size = L / 2 + 1;
-    writei(n.sons[ip], i1);
+//    writei(n.sons[ip], i1); // write later
 
     if (n.size < M) { // case3
       for (int i = n.size; i > ip; --i) {
@@ -334,6 +341,8 @@ private:
       }
       n.keys[ip] = i2.vals[0].first;
       n.sons[ip + 1] = writei(i2);
+      i1.next = n.sons[ip + 1];
+      writei(n.sons[ip], i1);
       n.size++;
       writen(road[ptr].second, n);
       return;
@@ -346,6 +355,8 @@ private:
     for (int i = M / 2 - 1; i >= 0; --i) {
       if (flag && t == ip) {
         n2.sons[i] = writei(i2);
+        i1.next = n2.sons[i];
+        writei(n.sons[ip], i1);
         if (i) n2.keys[i - 1] = i2.vals[0].first;
         else key = i2.vals[0].first;
         flag = false;
@@ -361,6 +372,8 @@ private:
     for (int i = M / 2; i >= 0; --i) {
       if (flag && t == ip) {
         n1.sons[i] = writei(i2);
+        i1.next = n2.sons[i];
+        writei(n.sons[ip], i1);
         if (i) n1.keys[i - 1] = i2.vals[0].first;
         flag = false;
         continue;
@@ -533,6 +546,7 @@ private:
           if (i == ip) continue;
           il.vals[il.size++] = in.vals[i];
         }
+        il.next = in.next;
         writei(n.sons[road[ptr].first - 1], il);
         in = il;
         for (int i = road[ptr].first; i < n.size - 1; ++i) {
@@ -573,6 +587,7 @@ private:
         for (int i = 0; i < ir.size; ++i) {
           in.vals[in.size++] = ir.vals[i];
         }
+        in.next = ir.next;
         writei(road[ptr].second, in);
         for (int i = road[ptr].first + 1; i < n.size - 1; ++i) {
           n.keys[i] = n.keys[i + 1];
@@ -595,7 +610,7 @@ private:
       }
       for (int i = ip; i < in.size - 1; ++i) in.vals[i] = in.vals[i + 1];
       in.size--;
-      writei(road[ptr].second, in);
+      writei(road[ptr].second, in); // if it has a sibling, won't get here
       if (in.size) return;
       for (int i = road[ptr].first; i < n.size - 1; ++i) {
         n.keys[i] = n.keys[i + 1];
