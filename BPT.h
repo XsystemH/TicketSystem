@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 4 // 160
-#define L 4 // 256
+#define M 160
+#define L 256
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -204,24 +204,19 @@ private:
     bool flag = false;
     int i;
     for (i = 0; i < n.size - 1; ++i) {
-//      if (i < n.size - 2 && index > n.keys[i + 1]) {
-//        continue;
-//      }
+      if (index > n.keys[i]) {
+        continue;
+      }
       if (n.keys[i] > index) {
         if (flag) break;
         else flag = true;
       }
       if (n.type) {
         info in = readi(n.sons[i]);
-        if (i != 0) {
-          if (in.vals[0].first > index) return -1;
-          if (in.vals[0].first == index && in.vals[0].second > value) return -1;
-        }
-        if (flag) return i; // index < n.keys[i]
-        if (in.next == -1) return i;
-        info nxt = readi(in.next);
-        if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
-          return i;
+        if (in.vals[in.size - 1].first > index) return i;
+        else if (in.vals[in.size - 1].first == index &&
+                 in.vals[in.size - 1].second > value) return i;
+        else if (flag) return i; // index < n.keys[i]
       }
       else {
         road.push_back(std::make_pair(i,n.sons[i]));
@@ -234,11 +229,10 @@ private:
     if (i != n.size - 1) return -1;
     if (n.type) {
       info in = readi(n.sons[i]);
-      if (i != 0) {
-        if (in.vals[0].first > index) return -1;
-        if (in.vals[0].first == index && in.vals[0].second > value) return -1;
-      }
-      if (in.next == -1) return i;
+      if (in.vals[in.size - 1].first > index) return i;
+      else if (in.vals[in.size - 1].first == index &&
+               in.vals[in.size - 1].second > value) return i;
+      else if (in.next == -1) return i;
       info nxt = readi(in.next);
       if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
         return i;
@@ -469,9 +463,9 @@ private:
     bool flag = false;
     int i;
     for (i = 0; i < n.size - 1; ++i) {
-//      if (i < n.size - 2 && index > n.keys[i + 1]) {
-//        continue;
-//      }
+      if (index > n.keys[i]) {
+        continue;
+      }
       if (n.keys[i] > index) {
         if (flag) break;
         else flag = true;
@@ -568,7 +562,7 @@ private:
         writei(n.sons[road[ptr].first - 1], il);
         in = il;
         for (int i = road[ptr].first; i < n.size - 1; ++i) {
-          n.keys[i] = n.keys[i + 1];
+          n.keys[i - 1] = n.keys[i];
           n.sons[i] = n.sons[i + 1];
         }
         n.size--;
@@ -608,7 +602,7 @@ private:
         in.next = ir.next;
         writei(road[ptr].second, in);
         for (int i = road[ptr].first + 1; i < n.size - 1; ++i) {
-          n.keys[i] = n.keys[i + 1];
+          n.keys[i - 1] = n.keys[i];
           n.sons[i] = n.sons[i + 1];
         }
         n.size--;
@@ -662,7 +656,7 @@ private:
           writen(road[ptr - 1].second, n);
           return;
         }
-        if (nl.size == M / 2) {
+        else {
           for (int i = 0; i < ns.size; ++i) {
             nl.keys[nl.size] = ns.keys[i];
             nl.sons[nl.size] = ns.sons[i];
@@ -670,7 +664,7 @@ private:
           }
           writen(n.sons[road[ptr].first - 1], nl);
           for (int i = road[ptr].first; i < n.size - 1; ++i) {
-            n.keys[i] = n.keys[i + 1];
+            n.keys[i - 1] = n.keys[i];
             n.sons[i] = n.sons[i + 1];
           }
           n.size--;
@@ -698,7 +692,7 @@ private:
           writen(road[ptr - 1].second, n);
           return;
         }
-        if (nr.size == M / 2) {
+        else {
           for (int i = 0; i < nr.size; ++i) {
             ns.keys[ns.size] = nr.keys[i];
             ns.sons[ns.size] = nr.sons[i];
@@ -706,7 +700,7 @@ private:
           }
           writen(road[ptr].second, ns);
           for (int i = road[ptr].first + 1; i < n.size - 1; ++i) {
-            n.keys[i] = n.keys[i + 1];
+            n.keys[i - 1] = n.keys[i];
             n.sons[i] = n.sons[i + 1];
           }
           n.size--;
@@ -716,6 +710,17 @@ private:
           }
         }
       }
+
+      if (ptr == 1) {
+        if (!flag) {
+          writen(road[ptr - 1].second, n);
+          return;
+        }
+        if (n.size == 0) renewroot(0);
+        else writen(road[ptr - 1].second, n);
+        return;
+      }
+
       ns = n;
       ptr--;
     } // while
