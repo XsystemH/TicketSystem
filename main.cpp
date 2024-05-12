@@ -70,8 +70,8 @@ unsigned long long hash(std::string &s) {
 }
 
 int main() {
-//  freopen("in", "r", stdin);
-//  freopen("out", "w", stdout);
+  freopen("in", "r", stdin);
+  freopen("out", "w", stdout);
   int n;
   std::cin >> n;
   std::string opt;

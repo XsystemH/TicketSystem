@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 160
-#define L 256
+#define M 4 // 160
+#define L 4 // 256
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -148,7 +148,7 @@ private:
   }
 
   void printL(info l) {
-    std::cout << l.size << std::endl;
+    std::cout << "size: " << l.size << " next: " << l.next << std::endl;
     for (int i = 0; i < L; ++i) {
       std::cout << l.vals[i].first << " " << l.vals[i].second << std::endl;
     }
@@ -289,6 +289,7 @@ private:
     if (in.size < L) { // case2
       info ni;
       ni.size = in.size + 1;
+      ni.next = in.next;
       int t = in.size;
       bool flag = true;
       for (int i = in.size - 1; i >= 0; --i) {
@@ -322,6 +323,7 @@ private:
       i2.vals[i] = in.vals[t--];
     }
     i2.size = L / 2;
+    i2.next = in.next;
     for (int i = L / 2; i >= 0; --i) { // L is even
       if (flag && (in.vals[t].first < index || (in.vals[t].first == index && in.vals[t].second < value))) {
         i1.vals[i] = std::make_pair(index, value);
@@ -739,6 +741,7 @@ public:
 
   void test() {
     if (root == 0) return;
+    std::cout << "=================================" << std::endl;
     vector<int> ans;
     vector<int> stack;
     int t = 0, i;
