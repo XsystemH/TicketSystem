@@ -721,7 +721,7 @@ private:
           ns.sons[i] = ns.sons[i + 1];
         }
         ns.size--;
-        writen(road[ptr].second, ns); // if it has a sibling, won't get here
+        writen(road[ptr].second, ns);
         if (ns.size) return;
         for (int i = road[ptr].first; i < n.size - 1; ++i) {
           n.keys[i] = n.keys[i + 1];
@@ -729,6 +729,7 @@ private:
         }
         n.size--;
         if (n.size == 0) renewroot(0);
+        else if (n.size == 1) renewroot(n.sons[0]);
         else writen(road[ptr - 1].second, n);
         return;
       }
