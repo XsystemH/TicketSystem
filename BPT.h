@@ -204,9 +204,9 @@ private:
     bool flag = false;
     int i;
     for (i = 0; i < n.size - 1; ++i) {
-      if (index > n.keys[i]) {
-        continue;
-      }
+//      if (index > n.keys[i]) {
+//        continue;
+//      }
       if (n.keys[i] > index) {
         if (flag) break;
         else flag = true;
