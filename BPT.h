@@ -233,7 +233,7 @@ private:
       else if (in.vals[in.size - 1].first == index &&
                in.vals[in.size - 1].second > value) return i;
       else if (in.next == -1) return i;
-      info nxt = readi(in.next).vals[0].first;
+      info nxt = readi(in.next);
       if (index < nxt.vals[0].first || (index == nxt.vals[0].first && value < nxt.vals[0].second))
         return i;
     }
