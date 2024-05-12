@@ -14,8 +14,8 @@
 #include <iomanip> // 仅用于调试
 
 #define vector std::vector
-#define M 160
-#define L 256
+#define M 4 // 160
+#define L 4 // 256
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -204,9 +204,9 @@ private:
     bool flag = false;
     int i;
     for (i = 0; i < n.size - 1; ++i) {
-      if (i < n.size - 2 && index > n.keys[i + 1]) {
-        continue;
-      }
+//      if (i < n.size - 2 && index > n.keys[i + 1]) {
+//        continue;
+//      }
       if (n.keys[i] > index) {
         if (flag) break;
         else flag = true;
@@ -469,9 +469,9 @@ private:
     bool flag = false;
     int i;
     for (i = 0; i < n.size - 1; ++i) {
-      if (index > n.keys[i]) {
-        continue;
-      }
+//      if (i < n.size - 2 && index > n.keys[i + 1]) {
+//        continue;
+//      }
       if (n.keys[i] > index) {
         if (flag) break;
         else flag = true;
