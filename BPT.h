@@ -16,6 +16,7 @@
 #define vector sjtu::vector
 #define M 160
 #define L 256
+#define PoolSize 64
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -69,13 +70,38 @@ private:
     // 缓冲区中的数据可能还未被写入文件，这样可能会导致数据丢失。
   }
 
+  int  NodePos [PoolSize];
+  node NodePool[PoolSize];
+  int cur = 0, psi = 0;
+
   node readn(int pos) {
     // 读取一个node
+
+    // 检测内存池
+    int t = psi, i = cur - 1;
+    while (t > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == pos) {
+        return NodePool[i];
+      }
+      t--, i--;
+    }
+
     node result;
 //    Node.open("NODE");
     Node.seekg(pos, std::ios::beg);
     Node.read(reinterpret_cast<char*>(&result), sizeof(node));
 //    Node.close();
+
+    if (psi == PoolSize) {
+      Node.seekp(NodePos [cur], std::ios::beg);
+      Node.write(reinterpret_cast<char*>(&NodePool[cur]), sizeof(node));
+    } // 释放缓冲区 同步外存
+    NodePos [cur] = pos;
+    NodePool[cur] = result;
+    cur = (cur + 1) % PoolSize;
+    psi = std::min(psi + 1, PoolSize);
+
     return result;
   }
 
@@ -108,6 +134,18 @@ private:
   }
 
   void writen(int pos, node n) {
+
+    // 检测内存池
+    int t = psi, i = cur - 1;
+    while (t > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == pos) {
+        NodePool[i] = n;
+        return;
+      }
+      t--, i--;
+    }
+
 //    Node.open("NODE");
     Node.seekp(pos, std::ios::beg);
     Node.write(reinterpret_cast<char*>(&n), sizeof(node));
@@ -760,6 +798,10 @@ public:
     initialize();
   }
   ~BPT() {
+    for (int i = 0; i < psi; ++i) {
+      Node.seekp(NodePos [i], std::ios::beg);
+      Node.write(reinterpret_cast<char*>(&NodePool[i]), sizeof(node));
+    } // 释放缓冲区 同步外存
     Node.close();
     Info.close();
   }
