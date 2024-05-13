@@ -130,27 +130,27 @@ private:
   }
 
   void printN(node n) {
-    std::cout << (n.type ? "leaf" : "node") << std::endl;
-    std::cout << n.size;
-    std::cout << "  ";
+    std::cerr << (n.type ? "leaf" : "node") << std::endl;
+    std::cerr << n.size;
+    std::cerr << "  ";
     int i;
     for(i = 0; i < n.size - 1; ++i) {
-      std::cout << std::setw(4) << std::right << n.keys[i];
-      std::cout << "|";
+      std::cerr << std::setw(4) << std::right << n.keys[i];
+      std::cerr << "|";
     }
-    std::cout << std::setw(4) << std::right << n.keys[i];
-    std::cout << std::endl;
+    std::cerr << std::setw(4) << std::right << n.keys[i];
+    std::cerr << std::endl;
     for(i = 0; i < n.size; ++i) {
-      std::cout << std::setw(4) << std::right << n.sons[i];
-      std::cout << "|";
+      std::cerr << std::setw(4) << std::right << n.sons[i];
+      std::cerr << "|";
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
   }
 
   void printL(info l) {
-    std::cout << "size: " << l.size << " next: " << l.next << std::endl;
+    std::cerr << "size: " << l.size << " next: " << l.next << std::endl;
     for (int i = 0; i < L; ++i) {
-      std::cout << l.vals[i].first << " " << l.vals[i].second << std::endl;
+      std::cerr << l.vals[i].first << " " << l.vals[i].second << std::endl;
     }
   }
 
@@ -374,7 +374,7 @@ private:
     for (int i = M / 2; i >= 0; --i) {
       if (flag && t == ip) {
         n1.sons[i] = writei(i2);
-        i1.next = n2.sons[i];
+        i1.next = n1.sons[i];
         writei(n.sons[ip], i1);
         if (i) n1.keys[i - 1] = i2.vals[0].first;
         flag = false;
@@ -622,7 +622,7 @@ private:
       }
       for (int i = ip; i < in.size - 1; ++i) in.vals[i] = in.vals[i + 1];
       in.size--;
-      writei(road[ptr].second, in); // if it has a sibling, won't get here
+      writei(road[ptr].second, in);
       if (in.size) return;
       for (int i = road[ptr].first; i < n.size - 1; ++i) {
         n.keys[i] = n.keys[i + 1];
@@ -630,7 +630,14 @@ private:
       }
       n.size--;
       if (n.size == 0) renewroot(0);
-      else writen(road[ptr - 1].second, n);
+      else {
+        writen(road[ptr - 1].second, n);
+        if (road[ptr].first) {
+          info ir = readi(n.sons[road[ptr].first - 1]);
+          ir.next = in.next;
+          writei(n.sons[road[ptr].first - 1], ir);
+        }
+      }
       return;
     }
 
@@ -648,7 +655,7 @@ private:
           }
           ns.sons[0] = nl.sons[nl.size - 1];
           ns.keys[0] = n.keys[road[ptr].first - 1];
-          n.keys[road[ptr].first - 1] = nl.keys[nl.size - 1];
+          n.keys[road[ptr].first - 1] = nl.keys[nl.size - 2];
           ns.size++;
           nl.size--;
           writen(n.sons[road[ptr].first - 1], nl);
@@ -657,6 +664,7 @@ private:
           return;
         }
         else {
+          nl.keys[nl.size - 1] = n.keys[road[ptr].first - 1];
           for (int i = 0; i < ns.size; ++i) {
             nl.keys[nl.size] = ns.keys[i];
             nl.sons[nl.size] = ns.sons[i];
@@ -678,7 +686,7 @@ private:
       if (flag && road[ptr].first < n.size - 1) {
         node nr = readn(n.sons[road[ptr].first + 1]);
         if (nr.size > M / 2) {
-          ns.keys[ns.size] = n.keys[road[ptr].first];
+          ns.keys[ns.size - 1] = n.keys[road[ptr].first];
           ns.sons[ns.size] = nr.sons[0];
           ns.size++;
           n.keys[road[ptr].first] = nr.keys[0];
@@ -693,6 +701,7 @@ private:
           return;
         }
         else {
+          ns.keys[ns.size - 1] = n.keys[road[ptr].first];
           for (int i = 0; i < nr.size; ++i) {
             ns.keys[ns.size] = nr.keys[i];
             ns.sons[ns.size] = nr.sons[i];
@@ -766,7 +775,7 @@ public:
 
   void test() {
     if (root == 0) return;
-    std::cout << "=================================" << std::endl;
+    std::cerr << "=================================" << std::endl;
     vector<int> ans;
     vector<int> stack;
     int t = 0, i;
@@ -774,6 +783,7 @@ public:
     node n;
     while (t < stack.size()) {
       n = readn(stack[t]);
+      std::cerr << "pos: " << stack[t] << std::endl;
       printN(n);
       ++t;
       for (i = 0; i < n.size; ++i) {
@@ -784,7 +794,7 @@ public:
       }
     }
     for (int a : ans) {
-      std::cout << "pos: " << a << std::endl;
+      std::cerr << "pos: " << a << std::endl;
       printL(readi(a));
     }
   }

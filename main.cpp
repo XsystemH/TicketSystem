@@ -64,7 +64,7 @@ BPT<unsigned long long, int> s;
 unsigned long long hash(std::string &s) {
   unsigned long long ans = 0;
   for (char c : s) {
-    ans = ans * K + c + 129;
+    ans = ans * K + c;
   }
   return ans;
 }
