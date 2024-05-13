@@ -37,6 +37,7 @@ template<class INDEX, class VALUE>
 struct info {
   std::pair<INDEX, VALUE> vals[L];
   int size;
+  int next
 };
 ```
 
