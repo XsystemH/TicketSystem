@@ -54,7 +54,7 @@ private:
       Node.seekg(0, std::ios::beg);
       Node.read(reinterpret_cast<char*>(&root), sizeof(int)); // read head
     }
-    Node.close();
+//    Node.close();
 
     Info.open("INFO");
     if (!Info.good()) {
@@ -62,7 +62,7 @@ private:
       Info.close();
       Info.open("INFO");
     }
-    Info.close();
+//    Info.close();
 
     // 当你使用close函数关闭文件时，会自动刷新缓冲区中的数据，
     // 确保数据被写入到文件中。而不关闭文件的话，
@@ -72,61 +72,61 @@ private:
   node readn(int pos) {
     // 读取一个node
     node result;
-    Node.open("NODE");
+//    Node.open("NODE");
     Node.seekg(pos, std::ios::beg);
     Node.read(reinterpret_cast<char*>(&result), sizeof(node));
-    Node.close();
+//    Node.close();
     return result;
   }
 
   info readi(int pos) {
     // 读取一整个数据块
     info result;
-    Info.open("INFO");
+//    Info.open("INFO");
     Info.seekg(pos, std::ios::beg);
     Info.read(reinterpret_cast<char*>(&result), sizeof(info));
-    Info.close();
+//    Info.close();
     return result;
   }
 
   int writen(node n) {
-    Node.open("NODE");
+//    Node.open("NODE");
     Node.seekp(0, std::ios::end);
     int ans = Node.tellp();
     Node.write(reinterpret_cast<char*>(&n), sizeof(node));
-    Node.close();
+//    Node.close();
     return ans;
   }
 
   int writei(info i) {
-    Info.open("INFO");
+//    Info.open("INFO");
     Info.seekp(0, std::ios::end);
     int ans = Info.tellp();
     Info.write(reinterpret_cast<char*>(&i), sizeof(info));
-    Info.close();
+//    Info.close();
     return ans;
   }
 
   void writen(int pos, node n) {
-    Node.open("NODE");
+//    Node.open("NODE");
     Node.seekp(pos, std::ios::beg);
     Node.write(reinterpret_cast<char*>(&n), sizeof(node));
-    Node.close();
+//    Node.close();
   }
 
   void writei(int pos, info i) {
-    Info.open("INFO");
+//    Info.open("INFO");
     Info.seekp(pos, std::ios::beg);
     Info.write(reinterpret_cast<char*>(&i), sizeof(info));
-    Info.close();
+//    Info.close();
   }
 
   void renewroot(int newroot) {
     root = newroot;
-    Node.open("NODE");
+//    Node.open("NODE");
     Node.seekp(0, std::ios::beg);
     Node.write(reinterpret_cast<char*>(&root), sizeof(root));
-    Node.close();
+//    Node.close();
   }
 
   void printN(node n) {
@@ -759,7 +759,10 @@ public:
   BPT() {
     initialize();
   }
-  ~BPT() = default;
+  ~BPT() {
+    Node.close();
+    Info.close();
+  }
 
   void insert(INDEX index, VALUE value) {
     insert_AUX(index, value);
