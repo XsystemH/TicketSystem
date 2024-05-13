@@ -618,6 +618,7 @@ private:
     if (ptr == 1) {
       if (!flag) {
         writen(road[ptr - 1].second, n);
+        if (n.size == 1) renewroot(n.sons[0]);
         return;
       }
       for (int i = ip; i < in.size - 1; ++i) in.vals[i] = in.vals[i + 1];
@@ -633,9 +634,9 @@ private:
       else {
         writen(road[ptr - 1].second, n);
         if (road[ptr].first) {
-          info ir = readi(n.sons[road[ptr].first - 1]);
-          ir.next = in.next;
-          writei(n.sons[road[ptr].first - 1], ir);
+          info il = readi(n.sons[road[ptr].first - 1]);
+          il.next = in.next;
+          writei(n.sons[road[ptr].first - 1], il);
         }
       }
       return;
@@ -717,12 +718,14 @@ private:
             writen(road[ptr - 1].second, n);
             return;
           }
+          flag = false;
         }
       }
 
       if (ptr == 1) {
         if (!flag) {
           writen(road[ptr - 1].second, n);
+          if (n.size == 1) renewroot(n.sons[0]);
           return;
         }
         for (int i = road[ptr + 1].first; i < ns.size - 1; ++i) {
