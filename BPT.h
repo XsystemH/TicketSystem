@@ -6,7 +6,7 @@
 #define TICKETSYSTEM_BPT_H
 
 #include <iostream>
-#include "vector/vector.hpp" // 提交时记得换成“vector”
+#include "vector/vector.hpp"
 #include <fstream>
 #include <string>
 #include <cstring>
