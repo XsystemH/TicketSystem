@@ -14,7 +14,7 @@
 #include <iomanip> // 仅用于调试
 
 #define vector sjtu::vector
-#define M 512
+#define M 64
 #define L 256
 #define PoolSize 512
 
