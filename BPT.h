@@ -14,9 +14,9 @@
 #include <iomanip> // 仅用于调试
 
 #define vector sjtu::vector
-#define M 64
+#define M 512
 #define L 256
-#define PoolSize 128
+#define PoolSize 512
 
 template<class INDEX, class VALUE>
 class BPT {
