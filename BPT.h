@@ -16,7 +16,7 @@
 #define vector sjtu::vector
 #define M 160
 #define L 256
-#define PoolSize 160
+#define PoolSize 128
 
 template<class INDEX, class VALUE>
 class BPT {
