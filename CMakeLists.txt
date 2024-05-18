@@ -7,7 +7,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(code main.cpp
-        BPT.h
-        vector/exceptions.hpp
-        vector/vector.hpp)
+add_executable(code src/main.cpp
+        src/BPT.h
+        src/vector/exceptions.hpp
+        src/vector/vector.hpp)

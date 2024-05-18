@@ -158,6 +158,8 @@ void writei(int pos, info i) {
 }
 ```
 
+只在开始和结束打开和关闭文件, 提高了效率
+
 ### 更新`root`
 
 ```c++
@@ -204,3 +206,80 @@ Answer: DFS, 如果有缓存的话, 并不会有太大的重复回档的开销
   - step1. 新建节点作为根节点
   - step2. 将原有根节点分裂为两个节点, 传递数据
   - step3. 更新根节点的索引
+
+### delete操作
+
+略
+
+### BufferPool
+
+```c++
+  int  NodePos [PoolSize];
+  node NodePool[PoolSize];
+  int cur = 0, psi = 0;
+
+  node readn(int pos) {
+    // 读取一个node
+
+    // 检测内存池
+    int t = psi, i = cur - 1;
+    while (t > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == pos) {
+        return NodePool[i];
+      }
+      t--, i--;
+    }
+
+    node result;
+//    Node.open("NODE");
+    Node.seekg(pos, std::ios::beg);
+    Node.read(reinterpret_cast<char*>(&result), sizeof(node));
+//    Node.close();
+
+    if (psi == PoolSize) {
+      Node.seekp(NodePos [cur], std::ios::beg);
+      Node.write(reinterpret_cast<char*>(&NodePool[cur]), sizeof(node));
+    } // 释放缓冲区 同步外存
+    NodePos [cur] = pos;
+    NodePool[cur] = result;
+    cur = (cur + 1) % PoolSize;
+    psi = std::min(psi + 1, PoolSize);
+
+    return result;
+  }
+
+  void writen(int pos, node n) {
+    // 检测内存池
+    int t = psi, i = cur - 1;
+    while (t > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == pos) {
+        NodePool[i] = n;
+        return;
+      }
+      t--, i--;
+    }
+    //    Node.open("NODE");
+    Node.seekp(pos, std::ios::beg);
+    Node.write(reinterpret_cast<char*>(&n), sizeof(node));
+    //    Node.close();
+  }
+
+  ~BPT() {
+    for (int i = 0; i < psi; ++i) {
+      Node.seekp(NodePos [i], std::ios::beg);
+      Node.write(reinterpret_cast<char*>(&NodePool[i]), sizeof(node));
+    } // 释放缓冲区 同步外存
+    Node.close();
+    Info.close();
+  }
+```
+
+## TicketSystem后端
+
+### 对于BPT的适应调整
+
+由于需要存储用户、车次等多个信息, 需要支持传入两个文件名的构造函数
+
+### 
