@@ -37,7 +37,7 @@ std::string add_user(const CMD& cmd) {
     return "0";
   }
 
-  hashcode cur = UIDTYPE(cmd.cmd['u' - 'a']).get_hashcode();
+  hashcode cur = UIDTYPE(cmd.cmd['c' - 'a']).get_hashcode();
   if (LoginStack.find(cur) == LoginStack.end()) return "-1";
   // -c 已登录
   if (LoginStack[cur] <= to_num(cmd.cmd['g' - 'a'])) return "-1";
@@ -75,7 +75,7 @@ std::string logout(CMD& cmd) {
 }
 
 std::string query_profile(CMD& cmd) {
-  hashcode cur = UIDTYPE(cmd.cmd['u' - 'a']).get_hashcode();
+  hashcode cur = UIDTYPE(cmd.cmd['c' - 'a']).get_hashcode();
   if (LoginStack.find(cur) == LoginStack.end()) return "-1";
   // -c 已登录
   vector<USERINFO> user = Users.find(get_hashcode(cmd.cmd['u' - 'a']));
@@ -88,7 +88,7 @@ std::string query_profile(CMD& cmd) {
 }
 
 std::string modify_profile(CMD& cmd) {
-  hashcode cur = UIDTYPE(cmd.cmd['u' - 'a']).get_hashcode();
+  hashcode cur = UIDTYPE(cmd.cmd['c' - 'a']).get_hashcode();
   if (LoginStack.find(cur) == LoginStack.end()) return "-1";
   // -c 已登录
   vector<USERINFO> user = Users.find(get_hashcode(cmd.cmd['u' - 'a']));

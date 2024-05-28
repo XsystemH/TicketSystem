@@ -14,10 +14,10 @@
 #include <iomanip> // 仅用于调试
 #include <utility>
 
-#define vector sjtu::vector
-#define M 64
-#define L 256
-#define PoolSize 512
+using sjtu::vector;
+const int M = 64;
+const int L = 256;
+const int PoolSize = 512;
 
 template<class INDEX, class VALUE>
 class BPT {

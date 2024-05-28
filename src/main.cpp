@@ -34,7 +34,7 @@ int main() {
       continue;
     }
     if (cmd.type == "exit") {
-      std::cout << "bye\n";
+      std::cout << "bye" << std::endl;
       break;
     }
   }

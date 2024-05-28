@@ -169,11 +169,12 @@ private:
   int mm;
   int dd;
 public:
-  operator int() const {
+  explicit operator int() const {
     int ans = dd;
     if (mm == 7) ans += 30;
     if (mm == 8) ans += 61;
     ans *= 60;
+    return ans;
   } // 计算时 统一到分钟 便于计算?
   friend std::ostream& operator<<(std::ostream &os, DATE p) {
     os << std::setw(2) << std::setfill('0') << p.mm;
@@ -294,7 +295,7 @@ struct ORDER {
 struct CMD {
   std::string timestamp;
   std::string type;
-  int num;
+  int num = 0;
   std::string cmd[26]; // c - 'a'
 };
 
