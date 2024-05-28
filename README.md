@@ -284,3 +284,135 @@ Answer: DFS, 如果有缓存的话, 并不会有太大的重复回档的开销
 
 ### User类
 
+```c++
+struct USERINFO {
+  char username[20];
+  char password[30];
+  char name[5];
+  char mailAddr[30];
+  int  privilege;
+}
+
+class USER {
+private:
+  map<unsigned long long, int> LoginStack; // no need to store longer
+  BPT<unsigned long long, USERINFO> Users("USER_NODE", "USER_INFO");
+  
+};
+```
+
+### Time&Date类
+For the convenience
+
+```c++
+class TIME {
+private:  
+  int hh;
+  int mm;
+public:  
+  operator int() const {
+    return hh * 60 + mm;
+  } // 计算时 统一到分钟 便于计算?
+  friend std::ostream operator<<(std::ostream &o, TIME p) {
+    os << std::setw(2) << std::setfill('0') << p.hh;
+    os << '-';
+    os << std::setw(2) << std::setfill('0') << p.mm;
+    return os;
+  }
+  TIME(std::string &s) {
+    hh = (s[0] - '0') * 10 + s[1] - '0';
+    mm = (s[3] - '0') * 10 + s[4] - '0';
+  }
+};
+
+class DATE {
+private:
+  int mm;
+  int dd;
+pubulic:
+  operator int() const {
+    int ans = dd;
+    if (mm == 7) ans += 30;
+    if (mm == 8) ans += 61;
+    ans *= 60;
+  } // 计算时 统一到分钟 便于计算?
+  friend std::ostream operator<<(std::ostream &o, DATE p) {
+    os << std::setw(2) << std::setfill('0') << p.mm;
+    os << '-';
+    os << std::setw(2) << std::setfill('0') << p.dd;
+    return os;
+  }
+  DATE(std::string &s) {
+    mm = (s[0] - '0') * 10 + s[1] - '0';
+    dd = (s[3] - '0') * 10 + s[4] - '0';
+  }
+};
+```
+
+### Train类
+```c++
+struct TRAININFO_RAW {
+  char trainID[20];
+  int  stationNum;
+  char stations[100][20];
+  int  seatNum;
+  int  prices[100];
+  TIME startTime;
+  int  travleTimes[100];
+  int  stopoverTimes[100];
+  DATE saleDate[2];
+  char type;
+};
+
+struct TRAININFO {
+  char trainID[20];
+  int  stationNum;
+  unsigned long long stations[100]; // after hash
+  int  booked[100]; // 线段树 可便捷地查看区间余票
+  int  leavingTime[100];
+  int  arrivingTime[100];
+};
+
+class TRAIN {
+  
+};
+```
+
+### 指令处理
+
+```c++
+const std::string CMD[] = {
+  "add_user", "login", "logout", "query_profile", "modify_profile", "add_train",
+  "release_train", "query_train", "delete_train", "query_ticket", "query_transfer",
+  "buy_ticket", "query_order", "refund_ticket", "clean", "exit", "query_privilege"
+};
+```
+
+#### CMD类
+
+```c++
+class CMD {
+pubulic:
+  int timestamp;
+  int type;
+  int num;
+  std::string cmd[26]; // c - 'a'
+  
+};
+```
+
+参数排序
+
+### 数据存储
+
+索引(仅储存ID和privilege):
+乘客 车次
+
+原始数据(线性?):
+乘客信息
+车次信息
+
+处理数据
+发布列车-精简信息（购票相关）
+乘客-订单信息
+列车-订单信息

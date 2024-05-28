@@ -10,4 +10,9 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(code src/main.cpp
         src/BPT.h
         src/vector/exceptions.hpp
-        src/vector/vector.hpp)
+        src/vector/vector.hpp
+        src/CommandProcesser.h
+        src/Structs.h
+        src/Storage.h
+        src/map/map.hpp
+        src/User.h)

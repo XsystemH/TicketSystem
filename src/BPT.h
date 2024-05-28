@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <iomanip> // 仅用于调试
+#include <utility>
 
 #define vector sjtu::vector
 #define M 64
@@ -22,6 +23,7 @@ template<class INDEX, class VALUE>
 class BPT {
 private:
   int root; // towards the pos of root in file NODE
+  std::string NODE, INFO;
   std::fstream Node;
   std::fstream Info;
 
@@ -41,11 +43,11 @@ private:
   };
 
   void initialize() {
-    Node.open("NODE");
+    Node.open(NODE);
     if (!Node.good()) {
-      Node.open("NODE", std::ios::out);
+      Node.open(NODE, std::ios::out);
       Node.close();
-      Node.open("NODE"); // create file
+      Node.open(NODE); // create file
 
       root = 0;
       Node.seekp(0, std::ios::beg);
@@ -57,11 +59,11 @@ private:
     }
 //    Node.close();
 
-    Info.open("INFO");
+    Info.open(INFO);
     if (!Info.good()) {
-      Info.open("INFO", std::ios::out | std::ios::binary);
+      Info.open(INFO, std::ios::out | std::ios::binary);
       Info.close();
-      Info.open("INFO");
+      Info.open(INFO);
     }
 //    Info.close();
 
@@ -88,7 +90,7 @@ private:
     }
 
     node result;
-//    Node.open("NODE");
+//    Node.open(NODE);
     Node.seekg(pos, std::ios::beg);
     Node.read(reinterpret_cast<char*>(&result), sizeof(node));
 //    Node.close();
@@ -108,7 +110,7 @@ private:
   info readi(int pos) {
     // 读取一整个数据块
     info result;
-//    Info.open("INFO");
+//    Info.open(INFO);
     Info.seekg(pos, std::ios::beg);
     Info.read(reinterpret_cast<char*>(&result), sizeof(info));
 //    Info.close();
@@ -116,7 +118,7 @@ private:
   }
 
   int writen(node n) {
-//    Node.open("NODE");
+//    Node.open(NODE);
     Node.seekp(0, std::ios::end);
     int ans = Node.tellp();
     Node.write(reinterpret_cast<char*>(&n), sizeof(node));
@@ -125,7 +127,7 @@ private:
   }
 
   int writei(info i) {
-//    Info.open("INFO");
+//    Info.open(INFO);
     Info.seekp(0, std::ios::end);
     int ans = Info.tellp();
     Info.write(reinterpret_cast<char*>(&i), sizeof(info));
@@ -146,14 +148,14 @@ private:
       t--, i--;
     }
 
-//    Node.open("NODE");
+//    Node.open(NODE);
     Node.seekp(pos, std::ios::beg);
     Node.write(reinterpret_cast<char*>(&n), sizeof(node));
 //    Node.close();
   }
 
   void writei(int pos, info i) {
-//    Info.open("INFO");
+//    Info.open(INFO);
     Info.seekp(pos, std::ios::beg);
     Info.write(reinterpret_cast<char*>(&i), sizeof(info));
 //    Info.close();
@@ -161,7 +163,7 @@ private:
 
   void renewroot(int newroot) {
     root = newroot;
-//    Node.open("NODE");
+//    Node.open(NODE);
     Node.seekp(0, std::ios::beg);
     Node.write(reinterpret_cast<char*>(&root), sizeof(root));
 //    Node.close();
@@ -795,6 +797,13 @@ private:
 
 public:
   BPT() {
+    NODE = "NODE";
+    INFO = "INFO";
+    initialize();
+  }
+  BPT(std::string nod, std::string inf) {
+    NODE = std::move(nod);
+    INFO = std::move(inf);
     initialize();
   }
   ~BPT() {
@@ -845,6 +854,22 @@ public:
       std::cerr << "pos: " << a << std::endl;
       printL(readi(a));
     }
+  }
+
+  void clear() {
+    Node.close();
+    Info.close();
+    std::string cmd1 = "rm " + NODE;
+    std::string cmd2 = "rm " + INFO;
+    int result1 = system(cmd1.c_str());
+    int result2 = system(cmd2.c_str());
+    cur = 0;
+    psi = 0;
+    initialize();
+  }
+
+  bool empty() {
+    return root == 0;
   }
 };
 
