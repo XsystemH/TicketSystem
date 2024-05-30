@@ -12,21 +12,29 @@
 using hashcode = unsigned long long;
 
 // user
+
+// <uid.hash, privilege>
 sjtu::map<hashcode, int> LoginStack;
+
+// <uid.hash, USERINFO>
 BPT<hashcode, USERINFO> Users("USER_NODE", "USER_INFO");
 
 // train
-BPT<hashcode, TRAININFO_RAW> Trains_Raw("TRAIN_NODE", "TRAIN_INFO");
-BPT<std::pair<DATE, hashcode>, DAYTRAIN> DayTrain("DAY_NODE", "DAY_INFO");
-BPT<hashcode, TRAININFO> Pub_Train("PUB_NODE", "PUB_INFO");
-BPT<std::pair<hashcode, DATE>, STATYPE> Station("STA_NODE", "STA_INFO");
+
+// <tid.hash, Raw>
+BPT<hashcode, TRAININFO> Trains("TRAIN_NODE", "TRAIN_INFO");
+
+// <<DATE, tid.hash>, DayTrain(seat)>
+BPT<std::pair<TIME, hashcode>, DAYTRAIN> DayTrain("DAY_NODE", "DAY_INFO");
+
+// <sta.hash, STATION>
+BPT<hashcode, STATION> Station("STA_NODE", "STA_INFO");
 
 void clear_all() {
   LoginStack.clear();
   Users.clear();
-  Trains_Raw.clear();
+  Trains.clear();
   DayTrain.clear();
-  Pub_Train.clear();
   Station.clear();
 }
 

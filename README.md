@@ -308,43 +308,43 @@ For the convenience
 class TIME {
 private:  
   int hh;
-  int mm;
+  int mon;
 public:  
   operator int() const {
-    return hh * 60 + mm;
+    return hh * 60 + mon;
   } // 计算时 统一到分钟 便于计算?
   friend std::ostream operator<<(std::ostream &o, TIME p) {
     os << std::setw(2) << std::setfill('0') << p.hh;
     os << '-';
-    os << std::setw(2) << std::setfill('0') << p.mm;
+    os << std::setw(2) << std::setfill('0') << p.mon;
     return os;
   }
   TIME(std::string &s) {
     hh = (s[0] - '0') * 10 + s[1] - '0';
-    mm = (s[3] - '0') * 10 + s[4] - '0';
+    mon = (s[3] - '0') * 10 + s[4] - '0';
   }
 };
 
 class DATE {
 private:
-  int mm;
-  int dd;
+  int mon;
+  int day;
 pubulic:
   operator int() const {
-    int ans = dd;
-    if (mm == 7) ans += 30;
-    if (mm == 8) ans += 61;
+    int ans = day;
+    if (mon == 7) ans += 30;
+    if (mon == 8) ans += 61;
     ans *= 60;
   } // 计算时 统一到分钟 便于计算?
   friend std::ostream operator<<(std::ostream &o, DATE p) {
-    os << std::setw(2) << std::setfill('0') << p.mm;
+    os << std::setw(2) << std::setfill('0') << p.mon;
     os << '-';
-    os << std::setw(2) << std::setfill('0') << p.dd;
+    os << std::setw(2) << std::setfill('0') << p.day;
     return os;
   }
   DATE(std::string &s) {
-    mm = (s[0] - '0') * 10 + s[1] - '0';
-    dd = (s[3] - '0') * 10 + s[4] - '0';
+    mon = (s[0] - '0') * 10 + s[1] - '0';
+    day = (s[3] - '0') * 10 + s[4] - '0';
   }
 };
 ```

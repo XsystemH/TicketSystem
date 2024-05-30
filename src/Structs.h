@@ -9,9 +9,9 @@
 #include <string>
 #include <iomanip>
 
-#define K 277
-
 using hashcode = unsigned long long;
+
+const int K = 277;
 
 struct UIDTYPE {
   char uid[20];
@@ -33,6 +33,7 @@ struct UIDTYPE {
     for (int i = 0; i < other.len; ++i) {
       uid[i] = other.uid[i];
     }
+    uid[other.len] = '\0';
     len = other.len;
     h = other.h;
     return *this;
@@ -68,6 +69,7 @@ struct PWDTYPE {
     for (int i = 0; i < other.len; ++i) {
       pwd[i] = other.pwd[i];
     }
+    pwd[other.len] = '\0';
     len = other.len;
     h = other.h;
     return *this;
@@ -92,6 +94,7 @@ struct NAMETYPE {
     for (int i = 0; i < other.len; ++i) {
       name[i] = other.name[i];
     }
+    name[other.len] = '\0';
     len = other.len;
     return *this;
   }
@@ -112,6 +115,7 @@ struct MAILTYPE {
     for (int i = 0; i < other.len; ++i) {
       mail[i] = other.mail[i];
     }
+    mail[other.len] = '\0';
     len = other.len;
     return *this;
   }
@@ -145,50 +149,104 @@ struct USERINFO {
 
 class TIME {
 private:
-  int hh;
-  int mm;
-public:
-  operator int() const {
-    return hh * 60 + mm;
-  } // 计算时 统一到分钟 便于计算?
-  friend std::ostream& operator<<(std::ostream &os, TIME p) {
-    os << std::setw(2) << std::setfill('0') << p.hh;
-    os << '-';
-    os << std::setw(2) << std::setfill('0') << p.mm;
-    return os;
-  }
-  TIME(std::string &s) {
-    hh = (s[0] - '0') * 10 + s[1] - '0';
-    mm = (s[3] - '0') * 10 + s[4] - '0';
-  }
-  TIME() = default;
-};
-
-class DATE {
-private:
-  int mm;
-  int dd;
+  int mon;
+  int day;
+  int hou;
+  int min;
 public:
   explicit operator int() const {
-    int ans = dd;
-    if (mm == 7) ans += 30;
-    if (mm == 8) ans += 61;
+    int ans = day;
+    if (mon == 7) ans += 30;
+    if (mon == 8) ans += 61;
+    ans *= 24;
+    ans += hou;
     ans *= 60;
+    ans += min;
     return ans;
-  } // 计算时 统一到分钟 便于计算?
-  friend std::ostream& operator<<(std::ostream &os, DATE p) {
-    os << std::setw(2) << std::setfill('0') << p.mm;
-    os << '-';
-    os << std::setw(2) << std::setfill('0') << p.dd;
-    return os;
+  } // 计算时 统一到分钟 便于比较
+  std::string string_date() {
+    std::string s;
+    s = "00-00";
+    s[0] = char(mon / 10 + '0');
+    s[1] = char(mon % 10 + '0');
+    s[3] = char(day / 10 + '0');
+    s[4] = char(day % 10 + '0');
+    return s;
   }
-  DATE(std::string &s) {
-    mm = (s[0] - '0') * 10 + s[1] - '0';
-    dd = (s[3] - '0') * 10 + s[4] - '0';
+  std::string string_time() {
+    std::string s;
+    s = "00:00";
+    s[0] = char(hou / 10 + '0');
+    s[1] = char(hou % 10 + '0');
+    s[3] = char(min / 10 + '0');
+    s[4] = char(min % 10 + '0');
+    return s;
   }
-  DATE() = default;
-  friend bool operator<(const DATE& d1, const DATE& d2) {
+  TIME(std::string &s) {
+    if (s[2] == '-') {
+      mon = (s[0] - '0') * 10 + s[1] - '0';
+      day = (s[3] - '0') * 10 + s[4] - '0';
+      hou = 0;
+      min = 0;
+    }
+    if (s[2] == ':') {
+      mon = 0;
+      day = 0;
+      hou = (s[0] - '0') * 10 + s[1] - '0';
+      min = (s[3] - '0') * 10 + s[4] - '0';
+    }
+  }
+  TIME(int t) {
+    hou = t / 60;
+    min = t % 60;
+    day = hou / 24; // 不超过72小时
+    hou = hou % 24;
+  }
+  TIME() {
+    mon = 0;
+    day = 0;
+    hou = 0;
+    min = 0;
+  }
+  friend bool operator<(const TIME& d1, const TIME& d2) {
     return int(d1) < int(d2);
+  }
+  TIME& operator++() {
+    ++day;
+    if ((day == 31 && mon == 6) || (day == 32 && mon == 7)) {
+      ++mon;
+      day = 1;
+    }
+    return *this;
+  }
+  friend TIME operator+(const TIME& t1, const TIME& t2) {
+    TIME t;
+    t.mon = t1.mon + t2.mon;
+    t.day = t1.day + t2.day;
+    t.hou = t1.hou + t2.hou;
+    t.min = t1.min + t2.min;
+    t.hou += t.min / 60;
+    t.min %= 60;
+    t.day += t.hou / 24;
+    t.hou %= 60;
+    if ((t.day >= 31 && t.mon == 6) || (t.day >= 32 && t.mon == 7)) {
+      ++t.mon;
+      t.day = 1;
+    }
+    return t;
+  }
+  friend int operator-(const TIME& t1, const TIME& t2) {
+    return int(t1) - int(t2);
+  }
+  TIME& operator=(const TIME& other) = default;
+  friend bool operator<(TIME& t1, TIME& t2) {
+    return int(t1) < int(t2);
+  }
+  friend bool operator==(const TIME& t1, const TIME& t2) {
+    return int(t1) == int(t2);
+  }
+  friend bool operator<=(TIME& t1, TIME& t2) {
+    return int(t1) <= int(t2);
   }
 };
 
@@ -212,12 +270,21 @@ struct TIDTYPE {
     for (int i = 0; i < other.len; ++i) {
       tid[i] = other.tid[i];
     }
+    tid[other.len] = '\0';
     len = other.len;
     h = other.h;
     return *this;
   }
   friend bool operator==(TIDTYPE& tid1, TIDTYPE& tid2) {
     return tid1.get_hashcode() == tid2.get_hashcode();
+  }
+  friend bool operator<(const TIDTYPE& tid1, const TIDTYPE& tid2) {
+    if (tid1.len != tid2.len) return tid1.len < tid2.len;
+    for (int i = 0; i < tid1.len; ++i) {
+      if (tid1.tid[i] != tid2.tid[i])
+        return tid1.tid[i] < tid2.tid[i];
+    }
+    return false;
   }
 };
 
@@ -241,6 +308,7 @@ struct STATYPE {
     for (int i = 0; i < other.len; ++i) {
       sta[i] = other.sta[i];
     }
+    sta[other.len] = '\0';
     len = other.len;
     h = other.h;
     return *this;
@@ -253,17 +321,50 @@ struct STATYPE {
 struct TRAININFO_RAW {
   TIDTYPE trainID;
   int  stationNum;
-  char stations[100];
+  STATYPE stations[100];
   int  seatNum;
   int  prices[100];
   TIME startTime;
   int  travleTimes[100];
   int  stopoverTimes[100];
-  DATE saleDate[2];
+  TIME saleDate[2];
   char type;
+
+  friend bool operator<(TRAININFO_RAW& t1, TRAININFO_RAW& t2) {
+    return t1.trainID.get_hashcode() < t2.trainID.get_hashcode();
+  }
+  friend bool operator>(TRAININFO_RAW& t1, TRAININFO_RAW& t2) {
+    return t1.trainID.get_hashcode() > t2.trainID.get_hashcode();
+  }
+  friend bool operator==(TRAININFO_RAW& t1, TRAININFO_RAW& t2) {
+    return t1.trainID.get_hashcode() == t2.trainID.get_hashcode();
+  }
 };
 
+struct STATION {
+  TIDTYPE trainID;
+  int cost; // from start station
+  int rank; // n th in the road of the train
+  int seatNum;
+  TIME sDate, eDate;
+  TIME arriving, leaving;
+
+  STATION() = default;
+
+  friend bool operator<(STATION& s1, STATION& s2) {
+    return s1.trainID.get_hashcode() < s2.trainID.get_hashcode();
+  }
+  friend bool operator>(STATION& s1, STATION& s2) {
+    return s1.trainID.get_hashcode() > s2.trainID.get_hashcode();
+  }
+  friend bool operator==(STATION& s1, STATION& s2) {
+    return s1.trainID.get_hashcode() == s2.trainID.get_hashcode();
+  }
+};
+
+// Seat of <DATE, Tid>
 struct DAYTRAIN {
+  int num;
   int seat[100];
 
   int query_seat(int l, int r) {
@@ -277,16 +378,107 @@ struct DAYTRAIN {
     for (int i = l; i < r; ++i)
       seat[i] += a;
   }
+
+  DAYTRAIN() =default;
+  DAYTRAIN(int x) {
+    num = x;
+    for (int i = 0; i < 100; ++i) {
+      seat[i] = x;
+    }
+  }
+
+  friend bool operator<(DAYTRAIN& dt1, DAYTRAIN& dt2) {
+    return dt1.num < dt2.num;
+  }
+  friend bool operator>(DAYTRAIN& dt1, DAYTRAIN& dt2) {
+    return dt1.num > dt2.num;
+  }
+  friend bool operator==(DAYTRAIN& dt1, DAYTRAIN& dt2) {
+    return dt1.num == dt2.num;
+  }
 };
 
 // get when publish a train
+// use to find transfer
 struct TRAININFO {
   TIDTYPE trainID;
   int  stationNum;
-  hashcode stations[100];
-  int  leavingTime[100];
-  int  arrivingTime[100];
+  int  seatNum;
+  STATYPE stations[100];
+  int cost[100];
+  TIME sDate, eDate;
+  TIME arrivingTime[100];
+  TIME leavingTime[100];
+  char type;
+  bool pub;
+
+  TRAININFO(TRAININFO_RAW& t) {
+    trainID = t.trainID;
+    stationNum = t.stationNum;
+    seatNum = t.seatNum;
+    for (int i = 0; i < stationNum; ++i) {
+      stations[i] = t.stations[i];
+    }
+    sDate = t.saleDate[0];
+    eDate = t.saleDate[1];
+    leavingTime[0] = t.startTime;
+    cost[0] = 0;
+    for (int i = 1; i < stationNum; ++i) {
+      if (i > 1) leavingTime[i - 1] = arrivingTime[i - 1] + t.stopoverTimes[i - 1];
+      arrivingTime[i] = leavingTime[i - 1] + t.travleTimes[i - 1];
+      cost[i] = cost[i - 1] + t.prices[i - 1];
+    }
+    type = t.type;
+    pub = false;
+  }
+  TRAININFO() = default;
+
+  friend bool operator<(TRAININFO& t1, TRAININFO& t2) {
+    return t1.trainID.get_hashcode() < t2.trainID.get_hashcode();
+  }
+  friend bool operator>(TRAININFO& t1, TRAININFO& t2) {
+    return t1.trainID.get_hashcode() > t2.trainID.get_hashcode();
+  }
+  friend bool operator==(TRAININFO& t1, TRAININFO& t2) {
+    return t1.trainID.get_hashcode() == t2.trainID.get_hashcode();
+  }
 };
+
+struct TICKET {
+  TIDTYPE trainID;
+  STATYPE from;
+  STATYPE dest;
+  TIME leaving;
+  TIME arriving;
+  int cost;
+  int seat;
+
+  std::string show() {
+    std::string s;
+    s += std::string(trainID.tid);
+    s += " " + std::string(from.sta);
+    s += " " + leaving.string_date();
+    s += " " + leaving.string_time();
+    s += " ->";
+    s += " " + std::string(dest.sta);
+    s += " " + arriving.string_date();
+    s += " " + arriving.string_time();
+    s += " " + std::to_string(cost);
+    s += " " + std::to_string(seat);
+    return s;
+  }
+};
+
+bool comp_time(const TICKET& t1, const TICKET& t2) {
+  if ((t1.arriving - t1.leaving) != (t2.arriving - t2.leaving))
+    return (t1.arriving - t1.leaving) < (t2.arriving - t2.leaving);
+  return t1.trainID < t2.trainID;
+};
+
+bool comp_cost(const TICKET& t1, const TICKET& t2) {
+  if (t1.cost != t2.cost) return t1.cost < t2.cost;
+  return t1.trainID < t2.trainID;
+}
 
 struct ORDER {
 
