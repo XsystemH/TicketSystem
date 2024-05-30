@@ -796,9 +796,10 @@ private:
   }
 
 public:
-  BPT() {
-    NODE = "NODE";
-    INFO = "INFO";
+  BPT() = default;
+  void select(std::string nod, std::string inf) {
+    NODE = std::move(nod);
+    INFO = std::move(inf);
     initialize();
   }
   BPT(std::string nod, std::string inf) {

@@ -17,4 +17,5 @@ add_executable(code src/main.cpp
         src/map/map.hpp
         src/Core.h
         src/MergeSort.h
+        src/LinearStorage.h
 )

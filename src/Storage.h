@@ -6,6 +6,7 @@
 #define TICKETSYSTEM_STORAGE_H
 
 #include "BPT.h"
+#include "LinearStorage.h"
 #include "map/map.hpp"
 #include "Structs.h"
 
@@ -17,12 +18,12 @@ using hashcode = unsigned long long;
 sjtu::map<hashcode, int> LoginStack;
 
 // <uid.hash, USERINFO>
-BPT<hashcode, USERINFO> Users("USER_NODE", "USER_INFO");
+BBPT<hashcode, USERINFO> Users("USER_NODE", "USER_KEYS","USER_INFO");
 
 // train
 
 // <tid.hash, Raw>
-BPT<hashcode, TRAININFO> Trains("TRAIN_NODE", "TRAIN_INFO");
+BBPT<hashcode, TRAININFO> Trains("TRAIN_NODE", "TRAIN_KEYS", "TRAIN_INFO");
 
 // <<DATE, tid.hash>, DayTrain(seat)>
 BPT<std::pair<TIME, hashcode>, DAYTRAIN> DayTrain("DAY_NODE", "DAY_INFO");
