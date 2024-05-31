@@ -358,7 +358,7 @@ struct TRAININFO_RAW {
   int  seatNum;
   int  prices[100];
   TIME startTime;
-  int  travleTimes[100];
+  int  travelTimes[100];
   int  stopoverTimes[100];
   DATE saleDate[2];
   char type;

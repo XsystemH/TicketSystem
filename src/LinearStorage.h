@@ -27,6 +27,9 @@ private:
   }
 public:
   Linear() = default;
+  ~Linear() {
+    Line.close();
+  }
   void select(std::string s) {
     FILE = std::move(s);
     initialize();
@@ -47,6 +50,10 @@ public:
     Line.read(reinterpret_cast<char*>(&result), sizeof(T));
     return result;
   }
+  int size() {
+    Line.seekp(0, std::ios::end);
+    return Line.tellp() / sizeof(T);
+  }
   void clear() {
     Line.close();
     std::string cmd = "rm " + FILE;
@@ -65,6 +72,7 @@ public:
     database.select(da);
     mapping.select(no, in);
   }
+  ~BBPT() = default;
   void insert(INDEX index, VALUE value) {
     mapping.insert(index, database.insert(value));
   }
@@ -85,6 +93,9 @@ public:
   }
   bool empty() {
     return mapping.empty();
+  }
+  int size() {
+    return database.size();
   }
   void clear() {
     mapping.clear();
