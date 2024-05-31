@@ -90,6 +90,7 @@ public:
     for (int i : keys) {
       ret.push_back(database.read(i));
     }
+    return ret;
   }
   bool empty() {
     return mapping.empty();

@@ -238,6 +238,7 @@ TICKET get_ticket(std::string s1, std::string s2, const STATION& fr, const STATI
   new_ticket.cost = to.cost - fr.cost;
   vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(day, fr.trainID.get_hashcode()));
   new_ticket.seat = dt[0].query_seat(fr.rank, to.rank);
+  return new_ticket;
 }
 
 std::string query_ticket(CMD& cmd) {
@@ -462,5 +463,6 @@ std::string refund_ticket(CMD& cmd) {
   }
   orders[n].status = 2;
   Order.modify(orders[n].userID.get_hashcode(), orders[n]);
+  return "0";
 }
 #endif //TICKETSYSTEM_CORE_H

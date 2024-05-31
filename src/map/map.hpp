@@ -292,6 +292,7 @@ private:
       if (remove(x, root->ri)) return true;
       return adjust(root, false);
     }
+    return false; // todo
   }
 
 private:
