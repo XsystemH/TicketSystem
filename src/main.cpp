@@ -41,6 +41,26 @@ int main() {
       std::cout << release_train(cmd) << std::endl;
       continue;
     }
+    if (cmd.type == "query_train") {
+      std::cout << query_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_transfer") {
+      std::cout << query_transfer(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "buy_ticket") {
+      std::cout << buy_ticket(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_order") {
+      std::cout << query_order(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "refund_ticket") {
+      std::cout << refund_ticket(cmd) << std::endl;
+      continue;
+    }
     if (cmd.type == "clear") {
       std::cout << "0" << std::endl;
       clear_all();
