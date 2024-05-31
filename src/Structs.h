@@ -15,7 +15,7 @@ using hashcode = unsigned long long;
 const int K = 277;
 
 struct UIDTYPE {
-  char uid[20];
+  char uid[21];
   int  len = 0;
   hashcode h = 0;
 
@@ -51,7 +51,7 @@ struct UIDTYPE {
 };
 
 struct PWDTYPE {
-  char pwd[20];
+  char pwd[31];
   int  len = 0;
   hashcode h = 0;
 
@@ -81,7 +81,7 @@ struct PWDTYPE {
 };
 
 struct NAMETYPE {
-  char name[10]; // 中文字符存贮
+  char name[21]; // 中文字符存贮
   int  len = 0;
   // 仅存贮字符信息 不涉及比较
   NAMETYPE() = default;
@@ -102,7 +102,7 @@ struct NAMETYPE {
 };
 
 struct MAILTYPE {
-  char mail[30];
+  char mail[31];
   int  len = 0;
 
   MAILTYPE() = default;
@@ -275,7 +275,7 @@ public:
 };
 
 struct TIDTYPE {
-  char tid[20];
+  char tid[21];
   int  len = 0;
   hashcode h = 0;
 
@@ -313,7 +313,7 @@ struct TIDTYPE {
 };
 
 struct STATYPE {
-  char sta[20];
+  char sta[41];
   int  len = 0;
   hashcode h = 0;
 

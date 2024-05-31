@@ -87,6 +87,7 @@ public:
   vector<VALUE> find(INDEX index) {
     vector<VALUE> ret;
     vector<int> keys = mapping.find(index);
+    if (keys.empty()) return ret;
     for (int i : keys) {
       ret.push_back(database.read(i));
     }

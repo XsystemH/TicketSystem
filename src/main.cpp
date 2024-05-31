@@ -1,10 +1,13 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include "CommandProcesser.h"
 #include "Structs.h"
 #include "Core.h"
 
 int main() {
+  freopen("in", "r", stdin);
+  freopen("out", "w", stdout);
   CMD cmd;
   while (true) {
     cmd = get_cmd();
