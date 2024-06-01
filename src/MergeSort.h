@@ -9,14 +9,14 @@
 
 template<typename T, typename Compare>
 void merge(sjtu::vector<T>& arr, size_t left, size_t mid, size_t right, Compare comp) {
-  sjtu::vector<T> leftArr(mid - left + 1);
-  sjtu::vector<T> rightArr(right - mid + 1);
+  sjtu::vector<T> leftArr;
+  sjtu::vector<T> rightArr;
 
-  for (size_t i = 0; i < leftArr.size(); ++i) {
-    leftArr[i] = arr[i + left];
+  for (size_t i = left; i < mid + 1; ++i) {
+    leftArr.push_back(arr[i]);
   }
-  for (size_t i = 0; i < rightArr.size(); ++i) {
-    rightArr[i] = arr[i + mid + 1];
+  for (size_t i = mid + 1; i < right + 1; ++i) {
+    rightArr.push_back(arr[i]);
   }
 
   size_t i = 0, j = 0, k = left;
@@ -40,7 +40,7 @@ void merge(sjtu::vector<T>& arr, size_t left, size_t mid, size_t right, Compare 
 template<typename T, typename Compare>
 void mergeSort(sjtu::vector<T>& arr, size_t left, size_t right, Compare comp) {
   if (left < right) {
-    size_t mid = left + (right - left) / 2;
+    size_t mid = (left + right) / 2;
     mergeSort(arr, left, mid, comp);
     mergeSort(arr, mid + 1, right, comp);
     merge(arr, left, mid, right, comp);

@@ -311,10 +311,6 @@ public:
     }
     end_of_storage = start + other.space();
   }
-  vector(const int space) {
-    finish = start = alloc.allocate(space);
-    end_of_storage = start + space;
-  }
 	/**
 	 * Destructor
 	 */

@@ -6,8 +6,8 @@
 #include "Core.h"
 
 int main() {
-  freopen("in", "r", stdin);
-  freopen("out", "w", stdout);
+//  freopen("in", "r", stdin);
+//  freopen("out", "w", stdout);
   CMD cmd;
   while (true) {
     cmd = get_cmd();
@@ -46,6 +46,10 @@ int main() {
     }
     if (cmd.type == "query_train") {
       std::cout << query_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_ticket") {
+      std::cout << query_ticket(cmd) << std::endl;
       continue;
     }
     if (cmd.type == "query_transfer") {

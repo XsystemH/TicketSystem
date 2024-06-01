@@ -152,7 +152,6 @@ std::string add_train(CMD& cmd) {
   vector<std::string> sName = divide_string(cmd.cmd['s' - 'a']);
   for (int i = 0; i < sName.size(); ++i) {
     new_train.stations[i] = sName[i];
-    new_train.stationNum++;
   }
   vector<int> p = divide_num(cmd.cmd['p' - 'a']);
   for (int i = 0; i < p.size(); ++i) {
@@ -165,11 +164,11 @@ std::string add_train(CMD& cmd) {
   }
   vector<int> sTime = divide_num(cmd.cmd['o' - 'a']);
   for (int i = 0; i < sTime.size(); ++i) {
-    new_train.stopoverTimes[i] = sTime[i];
+    new_train.stopoverTimes[i + 1] = sTime[i];
   }
   vector<std::string> sDate = divide_string(cmd.cmd['d' - 'a']);
   new_train.saleDate[0] = sDate[0];
-  new_train.saleDate[1] = sDate[0];
+  new_train.saleDate[1] = sDate[1];
   new_train.type = cmd.cmd['y' - 'a'][0];
 
   Trains.insert(new_train.trainID.get_hashcode(), new_train);
@@ -188,13 +187,14 @@ std::string delete_train(CMD& cmd) {
 std::string release_train(CMD& cmd) {
   vector<TRAININFO> train = Trains.find(get_hashcode(cmd.cmd['i' - 'a']));
   if (train.empty()) return "-1";
-
-  Trains.erase(train[0].trainID.get_hashcode(), train[0]);
+  if (train[0].pub) return "-1";
+//  Trains.erase(train[0].trainID.get_hashcode(), train[0]);
   train[0].pub = true;
-  Trains.insert(train[0].trainID.get_hashcode(), train[0]);
+  Trains.modify(train[0].trainID.get_hashcode(), train[0]);
   // pub
   for (int i = 0; i < train[0].stationNum; ++i) {
-    Station.insert(train[0].stations[i].get_hashcode(), STATION(train[0], i));
+    STATION new_station(train[0], i);
+    Station.insert(train[0].stations[i].get_hashcode(), new_station);
   }
   for (TIME d = train[0].sDate; d <= train[0].eDate; ++d) {
     DAYTRAIN day(train[0].seatNum);
@@ -208,7 +208,14 @@ std::string query_train(CMD& cmd) {
   if (train.empty()) return "-1";
   vector<DAYTRAIN> day;
   TIME date = cmd.cmd['d' - 'a'];
-  if (train[0].pub) day = DayTrain.find(std::make_pair(date, train[0].trainID.get_hashcode()));
+  if (train[0].pub) {
+    day = DayTrain.find(std::make_pair(date, train[0].trainID.get_hashcode()));
+    if (day.empty()) return "-1";
+  }
+  else {
+    if (date < train[0].sDate || train[0].eDate < date)
+      return "-1";
+  }
   std::string ret;
   ret += std::string(train[0].trainID.tid) + " " + train[0].type;
   for (int i = 0; i < train[0].stationNum; ++i) {
@@ -220,10 +227,11 @@ std::string query_train(CMD& cmd) {
     if (i == train[0].stationNum - 1) ret += "xx-xx xx:xx";
     else ret += (date + train[0].leavingTime[i]).string_date() + " " + (date + train[0].leavingTime[i]).string_time();
     ret += " " + std::to_string(train[0].cost[i]);
-    if (train[0].pub) ret += " " + std::to_string(day[0].seat[i]);
-    else ret += " " + std::to_string(train[0].seatNum);
-    if (i == train[0].stationNum - 1) ret += " x";
-    else ret += std::to_string(train[0].cost[i]);
+    if (i == train[0].stationNum - 1)  ret += " x";
+    else {
+      if (train[0].pub) ret += " " + std::to_string(day[0].seat[i]);
+      else ret += " " + std::to_string(train[0].seatNum);
+    }
   }
   return ret;
 }
@@ -233,10 +241,10 @@ TICKET get_ticket(std::string s1, std::string s2, const STATION& fr, const STATI
   new_ticket.trainID = fr.trainID;
   new_ticket.from = s1;
   new_ticket.dest = s2;
-  new_ticket.leaving = day + fr.leaving;
-  new_ticket.arriving = day + to.arriving;
+  new_ticket.leaving = day + fr.leaving.get_time();
+  new_ticket.arriving = day - fr.leaving.get_date() + to.arriving;
   new_ticket.cost = to.cost - fr.cost;
-  vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(day, fr.trainID.get_hashcode()));
+  vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(day - fr.leaving.get_date(), fr.trainID.get_hashcode()));
   new_ticket.seat = dt[0].query_seat(fr.rank, to.rank);
   return new_ticket;
 }
@@ -249,7 +257,7 @@ std::string query_ticket(CMD& cmd) {
   vector<STATION> to = Station.find(get_hashcode(cmd.cmd['t' - 'a']));
   if (to.empty()) return "0";
 
-  TIME day(cmd.cmd['d' - 'a']);
+  TIME day(cmd.cmd['d' - 'a']); // 站点日期(非始发站)
   vector<TICKET> tickets;
   for (int i = 0; i < fr.size(); ++i) {
     if (day < (fr[i].sDate + fr[i].leaving).get_date() || (fr[i].eDate + fr[i].leaving).get_date() < day) continue;
@@ -259,6 +267,9 @@ std::string query_ticket(CMD& cmd) {
         tickets.push_back(get_ticket(cmd.cmd['s' - 'a'], cmd.cmd['t' - 'a'], fr[i], to[j], day));
       }
     }
+  }
+  if (tickets.empty()) {
+    return "0";
   }
   if (cmd.cmd['p' - 'a'] == "time") mergeSort(tickets, comp_time);
   else mergeSort(tickets, comp_cost);
@@ -390,6 +401,7 @@ std::string buy_ticket(CMD& cmd) {
   if (flag) return "-1";
   vector<TRAININFO> train = Trains.find(fr.trainID.get_hashcode());
   vector<DAYTRAIN> day = DayTrain.find(std::make_pair(date - fr.leaving.get_date(), fr.trainID.get_hashcode()));
+  if (day.empty()) return "-1 (maybe wrong here)";
   STATION to;
   flag = true;
   for (int i = fr.rank; i < train[0].stationNum; ++i) {
@@ -412,18 +424,18 @@ std::string buy_ticket(CMD& cmd) {
   new_order.to_rank = to.rank;
   new_order.leaving = date + fr.leaving.get_time();
   new_order.arriving = new_order.leaving + to.arriving- fr.leaving;
-  new_order.cost = need * (train[0].cost[to.rank] - train[0].cost[fr.rank]);
+  new_order.cost = train[0].cost[to.rank] - train[0].cost[fr.rank];
   new_order.seat = need;
   if (need <= day[0].query_seat(fr.rank, to.rank)) {
     day[0].modify_seat(fr.rank, to.rank, -need);
-    DayTrain.modify(std::make_pair(fr.leaving - train[0].leavingTime[fr.rank], fr.trainID.get_hashcode()), day[0]);
+    DayTrain.modify(std::make_pair(date - fr.leaving.get_date(), fr.trainID.get_hashcode()), day[0]);
     new_order.status = 0;
     Order.insert(new_order.userID.get_hashcode(), new_order);
-    return std::to_string(new_order.cost);
+    return std::to_string(new_order.cost * need);
   }
   else {
-    if (cmd.cmd['p' - 'a'] == "true") {
-      new_order.status = 2;
+    if (cmd.cmd['q' - 'a'] == "true") {
+      new_order.status = 1;
       Order.insert(new_order.userID.get_hashcode(), new_order);
       Pending.insert(std::make_pair(new_order.trainID.get_hashcode(), new_order.date), new_order);
       return "queue";
@@ -438,8 +450,9 @@ std::string query_order(CMD& cmd) {
   std::string ret;
   vector<ORDER> orders = Order.find(get_hashcode(cmd.cmd['u' - 'a']));
   ret += std::to_string(orders.size());
-  for (auto & order : orders) {
-    ret += "\n" + order.show();
+  if (orders.empty()) return ret;
+  for (int i = orders.size() - 1; i >= 0; --i) {
+    ret += "\n" + orders[i].show();
   }
   return ret;
 }
@@ -450,6 +463,12 @@ std::string refund_ticket(CMD& cmd) {
   if (orders.empty()) return "-1";
   int n = 0;
   if (!cmd.cmd['n'- 'a'].empty()) n = to_num(cmd.cmd['n'- 'a']) - 1;
+  if (orders[n].status) { // not success
+    if (orders[n].status == 1) Pending.erase(std::make_pair(orders[n].trainID.get_hashcode(), orders[n].date), orders[n]);
+    orders[n].status = 2;
+    Order.modify(orders[n].userID.get_hashcode(), orders[n]);
+    return "0";
+  }
   vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(orders[n].date, orders[n].trainID.get_hashcode()));
   vector<ORDER> pending = Pending.find(std::make_pair(orders[n].trainID.get_hashcode(), orders[n].date));
   dt[0].modify_seat(orders[n].fr_rank, orders[n].to_rank, orders[n].seat);

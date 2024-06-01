@@ -148,7 +148,7 @@ struct USERINFO {
   }
 };
 //                               31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-const int day_of_month[13] = {0, 31, 60, 91,121,152,182,213,244,274,305,335,366};
+const int day_of_month[14] = {0, 0, 31, 60, 91,121,152,182,213,244,274,305,335,366};
 
 class TIME {
 private:
@@ -159,7 +159,7 @@ private:
 public:
   explicit operator int() const {
     int ans = day;
-    ans += day_of_month[mon - 1];
+    ans += day_of_month[mon];
     ans *= 24;
     ans += hou;
     ans *= 60;
@@ -184,7 +184,7 @@ public:
     s[4] = char(min % 10 + '0');
     return s;
   }
-  TIME get_date() {
+  TIME get_date() const {
     TIME date;
     date.mon = mon;
     date.day = day;
@@ -192,7 +192,7 @@ public:
     date.min = 0;
     return date;
   }
-  TIME get_time() {
+  TIME get_time() const {
     TIME time;
     time.mon = 0;
     time.day = 0;
@@ -219,10 +219,11 @@ public:
     min = t % 60;
     day = hou / 24; // 不超过72小时
     hou = hou % 24;
+    mon = 0;
     for (int i = 1; i <= 12; ++i) {
-      if (day_of_month[i - 1] < day <= day_of_month[i]) {
+      if (day_of_month[i] < day && day <= day_of_month[i + 1]) {
         mon = i;
-        day -= day_of_month[i - 1];
+        day -= day_of_month[i];
       }
     }
   }
@@ -232,6 +233,7 @@ public:
     hou = 0;
     min = 0;
   }
+  TIME& operator=(const TIME& other) = default;
   friend bool operator<(const TIME& d1, const TIME& d2) {
     return int(d1) < int(d2);
   }
@@ -252,7 +254,7 @@ public:
     t.hou += t.min / 60;
     t.min %= 60;
     t.day += t.hou / 24;
-    t.hou %= 60;
+    t.hou %= 24;
     if ((t.day >= 31 && t.mon == 6) || (t.day >= 32 && t.mon == 7) || (t.day == 32 && t.mon == 8)) {
       ++t.mon;
       t.day = 1;
@@ -262,7 +264,6 @@ public:
   friend int operator-(const TIME& t1, const TIME& t2) {
     return int(t1) - int(t2);
   }
-  TIME& operator=(const TIME& other) = default;
   friend bool operator<(TIME& t1, TIME& t2) {
     return int(t1) < int(t2);
   }
@@ -426,14 +427,13 @@ struct STATION {
 
   STATION() = default;
   STATION(TRAININFO train, int i) {
-    STATION sta;
-    sta.trainID = train.trainID;
-    sta.cost = train.cost[i];
-    sta.rank = i;
-    sta.sDate = train.sDate;
-    sta.eDate = train.eDate;
-    sta.arriving = train.arrivingTime[i];
-    sta.leaving = train.leavingTime[i];
+    trainID = train.trainID;
+    cost = train.cost[i];
+    rank = i;
+    sDate = train.sDate;
+    eDate = train.eDate;
+    arriving = train.arrivingTime[i];
+    leaving = train.leavingTime[i];
   }
 
   friend bool operator<(STATION& s1, STATION& s2) {
