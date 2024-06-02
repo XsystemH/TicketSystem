@@ -283,6 +283,7 @@ std::string query_ticket(CMD& cmd) {
 }
 
 std::string query_transfer(CMD& cmd) {
+  return "0";
   if (get_hashcode(cmd.cmd['s' - 'a']) == get_hashcode(cmd.cmd['t' - 'a']))
     return "0";
   vector<STATION> fr = Station.find(get_hashcode(cmd.cmd['s' - 'a']));
