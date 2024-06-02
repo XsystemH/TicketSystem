@@ -24,7 +24,7 @@ BBPT<hashcode, TRAININFO> Trains("TRAIN_NODE", "TRAIN_KEYS", "TRAIN_INFO");
 // <<DATE, tid.hash>, DayTrain(seat)>
 BBPT<std::pair<TIME, hashcode>, DAYTRAIN> DayTrain("DAY_NODE", "DAY_KEYS", "DAY_INFO");
 // <sta.hash, STATION>
-BPT<hashcode, STATION> Station("STA_NODE", "STA_INFO");
+BBPT<hashcode, STATION> Station("STA_NODE", "STA_KEYS", "STA_INFO");
 
 // order
 // <uid.hash, ORDER>

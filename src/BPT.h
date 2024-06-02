@@ -15,9 +15,6 @@
 #include <utility>
 
 using sjtu::vector;
-const int M = 64;
-const int L = 256;
-const int PoolSize = 256;
 
 template<class INDEX, class VALUE>
 class BPT {
@@ -26,6 +23,10 @@ private:
   std::string NODE, INFO;
   std::fstream Node;
   std::fstream Info;
+
+  static const int M = 64;
+  static const int L = 256;
+  static const int PoolSize = 512;
 
 private:
   struct node {
