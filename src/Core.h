@@ -263,9 +263,13 @@ vector<TICKET> query_ticket(std::string s, std::string t, TIME d, std::string p)
     if (fr[i].eDate + fr[i].leaving < d) continue;
     for (int j = 0; j < to.size(); ++j) {
       if (fr[i].trainID == to[j].trainID && fr[i].rank < to[j].rank) {
-        if (d.get_time() < fr[i].leaving.get_time())
-          tickets.push_back(get_ticket(s, t, fr[i], to[j], d.get_date()));
-        else tickets.push_back(get_ticket(s, t, fr[i], to[j], d.get_date() + 1));
+        TIME day(d);
+        if (d < fr[i].sDate + fr[i].leaving) tickets.push_back(get_ticket(s, t, fr[i], to[j], (fr[i].sDate + fr[i].leaving).get_date()));
+        else if (fr[i].leaving.get_time() < d.get_time()) {
+          ++day;
+          if (day < fr[i].eDate + fr[i].leaving) tickets.push_back(get_ticket(s, t, fr[i], to[j], day.get_date()));
+        }
+        else tickets.push_back(get_ticket(s, t, fr[i], to[j], d.get_date()));
       }
     }
   }
@@ -334,7 +338,7 @@ std::string query_transfer(CMD& cmd) {
       vector<TICKET> sec = query_ticket(std::string(train[0].stations[j].sta), cmd.cmd['t' - 'a'], fir.arriving,
                                         cmd.cmd['p' - 'a']);
       for (int k = 0; k < sec.size(); ++k) {
-        ticket.push_back(std::make_pair(fir, sec[k]));
+        if (fir.trainID != sec[k].trainID) ticket.push_back(std::make_pair(fir, sec[k]));
       }
     }
 

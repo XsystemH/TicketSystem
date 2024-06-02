@@ -630,22 +630,22 @@ struct TICKET {
 bool comp_time(const TICKET& t1, const TICKET& t2) {
   if ((t1.arriving - t1.leaving) != (t2.arriving - t2.leaving))
     return (t1.arriving - t1.leaving) < (t2.arriving - t2.leaving);
-  return t1.trainID < t2.trainID;
+  return std::string(t1.trainID.tid) < std::string(t2.trainID.tid);
 };
 
 bool comp_cost(const TICKET& t1, const TICKET& t2) {
   if (t1.cost != t2.cost) return t1.cost < t2.cost;
-  return t1.trainID < t2.trainID;
+  return std::string(t1.trainID.tid) < std::string(t2.trainID.tid);
 }
 
 bool comp_time_sum(const std::pair<TICKET, TICKET>& t1, const std::pair<TICKET, TICKET>& t2) {
-  if (t1.first.cost + t1.second.cost != t2.first.cost + t2.second.cost)
-    return t1.first.cost + t1.second.cost < t2.first.cost + t2.second.cost;
   if ((t1.second.arriving - t1.first.leaving) != (t2.second.arriving - t2.first.leaving))
     return (t1.second.arriving - t1.first.leaving) < (t2.second.arriving - t2.first.leaving);
+  if (t1.first.cost + t1.second.cost != t2.first.cost + t2.second.cost)
+    return t1.first.cost + t1.second.cost < t2.first.cost + t2.second.cost;
   if (t1.first.trainID.get_hashcode() != t2.first.trainID.get_hashcode())
-    return t1.first.trainID < t2.first.trainID;
-  else return t1.second.trainID < t2.second.trainID;
+    return std::string(t1.first.trainID.tid) < std::string(t2.first.trainID.tid);
+  else return std::string(t1.second.trainID.tid) < std::string(t2.second.trainID.tid);
 };
 
 bool comp_cost_sum(const std::pair<TICKET, TICKET>& t1, const std::pair<TICKET, TICKET>& t2) {
@@ -654,8 +654,8 @@ bool comp_cost_sum(const std::pair<TICKET, TICKET>& t1, const std::pair<TICKET, 
   if ((t1.second.arriving - t1.first.leaving) != (t2.second.arriving - t2.first.leaving))
     return (t1.second.arriving - t1.first.leaving) < (t2.second.arriving - t2.first.leaving);
   if (t1.first.trainID.get_hashcode() != t2.first.trainID.get_hashcode())
-    return t1.first.trainID < t2.first.trainID;
-  else return t1.second.trainID < t2.second.trainID;
+    return std::string(t1.first.trainID.tid) < std::string(t2.first.trainID.tid);
+  else return std::string(t1.second.trainID.tid) < std::string(t2.second.trainID.tid);
 }
 
 std::string Status[3] = {"[success]", "[pending]", "[refunded]"};
