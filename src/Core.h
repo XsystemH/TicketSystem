@@ -263,11 +263,14 @@ vector<TICKET> query_ticket(std::string s, std::string t, TIME d) {
     if (fr[i].eDate + fr[i].leaving < d) continue;
     for (int j = 0; j < to.size(); ++j) {
       if (fr[i].trainID == to[j].trainID && fr[i].rank < to[j].rank) {
+//        std::cout << std::string(fr[i].trainID.tid) << " " << (fr[i].eDate + fr[i].leaving).string_date() << " " << (fr[i].eDate + fr[i].leaving).string_time() << " ";
         TIME day(d);
-        if (d < fr[i].sDate + fr[i].leaving) tickets.push_back(get_ticket(s, t, fr[i], to[j], (fr[i].sDate + fr[i].leaving).get_date()));
-        else if (fr[i].leaving.get_time() < d.get_time()) {
+        if (d < fr[i].sDate + fr[i].leaving) {
+          tickets.push_back(get_ticket(s, t, fr[i], to[j], (fr[i].sDate + fr[i].leaving).get_date()));
+        }
+        else if (fr[i].leaving.get_time() < day.get_time()) {
           ++day;
-          if (day < fr[i].eDate + fr[i].leaving) tickets.push_back(get_ticket(s, t, fr[i], to[j], day.get_date()));
+          tickets.push_back(get_ticket(s, t, fr[i], to[j], day.get_date()));
         }
         else tickets.push_back(get_ticket(s, t, fr[i], to[j], d.get_date()));
       }
@@ -276,7 +279,6 @@ vector<TICKET> query_ticket(std::string s, std::string t, TIME d) {
   if (tickets.empty()) {
     return ans;
   }
-  mergeSort(tickets, comp_cost);
 
   return tickets;
 }
@@ -340,7 +342,6 @@ std::string query_transfer(CMD& cmd) {
   if (ticket.empty()) return "0";
   if (cmd.cmd['p' - 'a'] == "time") mergeSort(ticket, comp_time_sum);
   else mergeSort(ticket, comp_cost_sum);
-
   return ticket[0].first.show() + "\n" + ticket[0].second.show();
 }
 
