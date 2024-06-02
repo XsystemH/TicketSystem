@@ -97,8 +97,9 @@ std::string modify_profile(CMD& cmd) {
   vector<USERINFO> user = Users.find(get_hashcode(cmd.cmd['u' - 'a']));
   if (user.empty()) return "-1";
   // -u 存在
-  if (LoginStack[cur] < user[0].privilege) return "-1";
-  if (LoginStack[cur] == user[0].privilege && cur != user[0].username.get_hashcode()) return "-1";
+  if (LoginStack[cur] <= user[0].privilege) {
+    if (cur != user[0].username.get_hashcode()) return "-1";
+  }
   // -c 的权限大于 -u 的权限，或是 -c 和 -u 相同
 
 //  Users.erase(user[0].username.get_hashcode(), user[0]);
@@ -107,6 +108,8 @@ std::string modify_profile(CMD& cmd) {
   if (!cmd.cmd['n' - 'a'].empty()) user[0].name = cmd.cmd['n' - 'a'];
   if (!cmd.cmd['m' - 'a'].empty()) user[0].mailAddr = cmd.cmd['m' - 'a'];
   if (!cmd.cmd['g' - 'a'].empty()) user[0].privilege = to_num(cmd.cmd['g' - 'a']);
+
+  if (user[0].privilege >= LoginStack[cur]) return "-1";
 
   Users.modify(user[0].username.get_hashcode(), user[0]);
   if (LoginStack.find(user[0].username.get_hashcode()) != LoginStack.end())
