@@ -271,8 +271,8 @@ std::string query_ticket(CMD& cmd) {
   if (tickets.empty()) {
     return "0";
   }
-//  if (cmd.cmd['p' - 'a'] == "time") mergeSort(tickets, comp_time);
-//  else mergeSort(tickets, comp_cost);
+  if (cmd.cmd['p' - 'a'] == "time") mergeSort(tickets, comp_time);
+  else mergeSort(tickets, comp_cost);
 
   std::string ret;
   ret += std::to_string(tickets.size());

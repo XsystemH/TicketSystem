@@ -20,6 +20,7 @@ struct UIDTYPE {
   hashcode h = 0;
 
   UIDTYPE() = default;
+  ~UIDTYPE() = default;
   UIDTYPE(const std::string& s) {
     for (char c : s) {
       h = h * K + c;
@@ -64,6 +65,7 @@ struct PWDTYPE {
   hashcode h = 0;
 
   PWDTYPE() = default;
+  ~PWDTYPE() = default;
   PWDTYPE(const std::string& s) {
     for (char c : s) {
       h = h * K + c;
@@ -101,6 +103,7 @@ struct NAMETYPE {
   int  len = 0;
   // 仅存贮字符信息 不涉及比较
   NAMETYPE() = default;
+  ~NAMETYPE() = default;
   NAMETYPE(const std::string& s) {
     for (char c : s) {
       name[len++] = c;
@@ -129,6 +132,7 @@ struct MAILTYPE {
   int  len = 0;
 
   MAILTYPE() = default;
+  ~MAILTYPE() = default;
   MAILTYPE(const std::string& s) {
     for (char c : s) {
       mail[len++] = c;
@@ -167,6 +171,7 @@ struct USERINFO {
     privilege = other.privilege;
   }
   USERINFO() = default;
+  ~USERINFO() = default;
   friend bool operator<(USERINFO& u1, USERINFO& u2) {
     return u1.username < u2.username;
   }
@@ -325,6 +330,7 @@ struct TIDTYPE {
   hashcode h = 0;
 
   TIDTYPE() = default;
+  ~TIDTYPE() = default;
   TIDTYPE(const std::string& s) {
     for (char c : s) {
       h = h * K + c;
@@ -371,6 +377,7 @@ struct STATYPE {
   hashcode h = 0;
 
   STATYPE() = default;
+  ~STATYPE() = default;
   STATYPE(const std::string& s) {
     for (char c : s) {
       h = h * K + c;
@@ -481,6 +488,7 @@ struct TRAININFO {
     type = other.type;
   }
   TRAININFO() = default;
+  ~TRAININFO() = default;
 
   friend bool operator<(TRAININFO& t1, TRAININFO& t2) {
     return t1.trainID.get_hashcode() < t2.trainID.get_hashcode();
@@ -501,6 +509,7 @@ struct STATION {
   TIME arriving, leaving;
 
   STATION() = default;
+  ~STATION() = default;
   STATION(TRAININFO train, int i) {
     trainID = train.trainID;
     cost = train.cost[i];
@@ -548,7 +557,8 @@ struct DAYTRAIN {
       seat[i] += a;
   }
 
-  DAYTRAIN() =default;
+  DAYTRAIN() = default;
+  ~DAYTRAIN() = default;
   DAYTRAIN(int x) {
     num = x;
     for (int i = 0; i < 100; ++i) {
@@ -592,6 +602,7 @@ struct TICKET {
     seat = other.seat;
   }
   TICKET() = default;
+  ~TICKET() = default;
   std::string show() {
     std::string s;
     s += std::string(trainID.tid);
@@ -652,6 +663,7 @@ struct ORDER {
     status = other.status;
   }
   ORDER() = default;
+  ~ORDER() = default;
   std::string show() {
     std::string s;
     s += Status[status];

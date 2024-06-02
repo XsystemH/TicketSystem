@@ -22,8 +22,7 @@ CMD process(std::string &s) {
   std::istringstream input(s);
   std::string CmdType, CmdValue;
   input >> cmd.timestamp >> cmd.type;
-  while (!input.eof()) {
-    input >> CmdType >> CmdValue;
+  while (input >> CmdType >> CmdValue) {
     cmd.num++;
     cmd.cmd[CmdType[1] - 'a'] = CmdValue;
   }

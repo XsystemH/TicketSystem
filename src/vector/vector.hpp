@@ -253,7 +253,7 @@ public:
   {
     if (finish != end_of_storage)
     {
-      construct(finish, *(finish - 1)); // 确保能够正常复制
+      construct(finish, T()); // 确保能够正常复制
       ++finish;
       T x_copy = x;
       copy_backward(pos, finish - 2, finish - 1); // 将pos到finish-2向后对齐到finish-1
