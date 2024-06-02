@@ -271,8 +271,8 @@ std::string query_ticket(CMD& cmd) {
   if (tickets.empty()) {
     return "0";
   }
-  if (cmd.cmd['p' - 'a'] == "time") mergeSort(tickets, comp_time);
-  else mergeSort(tickets, comp_cost);
+//  if (cmd.cmd['p' - 'a'] == "time") mergeSort(tickets, comp_time);
+//  else mergeSort(tickets, comp_cost);
 
   std::string ret;
   ret += std::to_string(tickets.size());
@@ -283,7 +283,6 @@ std::string query_ticket(CMD& cmd) {
 }
 
 std::string query_transfer(CMD& cmd) {
-  return "0";
   if (get_hashcode(cmd.cmd['s' - 'a']) == get_hashcode(cmd.cmd['t' - 'a']))
     return "0";
   vector<STATION> fr = Station.find(get_hashcode(cmd.cmd['s' - 'a']));
