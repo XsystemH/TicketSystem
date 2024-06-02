@@ -6,8 +6,8 @@
 #include "Core.h"
 
 int main() {
-  freopen("in", "r", stdin);
-  freopen("out", "w", stdout);
+//  freopen("in", "r", stdin);
+//  freopen("out", "w", stdout);
   CMD cmd;
   while (true) {
     cmd = get_cmd();
