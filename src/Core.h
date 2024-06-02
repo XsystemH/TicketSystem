@@ -424,7 +424,7 @@ std::string buy_ticket(CMD& cmd) {
   new_order.dest = train[0].stations[to.rank];
   new_order.to_rank = to.rank;
   new_order.leaving = date + fr.leaving.get_time();
-  new_order.arriving = new_order.leaving + to.arriving- fr.leaving;
+  new_order.arriving = date - fr.leaving.get_date() + to.arriving;
   new_order.cost = train[0].cost[to.rank] - train[0].cost[fr.rank];
   new_order.seat = need;
   if (need <= day[0].query_seat(fr.rank, to.rank)) {
