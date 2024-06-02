@@ -15,8 +15,9 @@
 #include <utility>
 
 using sjtu::vector;
-const int M = 32;
-const int L = 128;
+
+const int M = 64;
+const int L = 256;
 const int PoolSize = 512;
 
 template<class INDEX, class VALUE>

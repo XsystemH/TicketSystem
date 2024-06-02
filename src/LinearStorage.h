@@ -17,6 +17,10 @@ private:
   std::string FILE;
   std::fstream Line;
 
+  int  NodePos [PoolSize];
+  T NodePool[PoolSize];
+  int cur = 0, psi = 0;
+
   void initialize() {
     Line.open(FILE);
     if (!Line.good()) {
@@ -32,6 +36,10 @@ public:
     initialize();
   }
   ~Linear() {
+    for (int i = 0; i < psi; ++i) {
+      Line.seekp(NodePos [i], std::ios::beg);
+      Line.write(reinterpret_cast<char*>(&NodePool[i]), sizeof(T));
+    }
     Line.close();
   }
   int insert(T t) {
@@ -41,13 +49,42 @@ public:
     return ans;
   }
   void insert(T t, int p) {
+    int x = psi, i = cur - 1;
+    while (x > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == p) {
+        NodePool[i] = t;
+        return;
+      }
+      x--, i--;
+    }
+
     Line.seekp(p, std::ios::beg);
     Line.write(reinterpret_cast<char*>(&t), sizeof(T));
   }
   T read(int p) {
+    int t = psi, i = cur - 1;
+    while (t > 0) {
+      if (i < 0) i += PoolSize;
+      if (NodePos[i] == p) {
+        return NodePool[i];
+      }
+      t--, i--;
+    }
+
     T result;
     Line.seekg(p, std::ios::beg);
     Line.read(reinterpret_cast<char*>(&result), sizeof(T));
+
+    if (psi == PoolSize) {
+      Line.seekp(NodePos [cur], std::ios::beg);
+      Line.write(reinterpret_cast<char*>(&NodePool[cur]), sizeof(T));
+    } // 释放缓冲区 同步外存
+    NodePos [cur] = p;
+    NodePool[cur] = result;
+    cur = (cur + 1) % PoolSize;
+    psi = std::min(psi + 1, PoolSize);
+
     return result;
   }
   int size() {
