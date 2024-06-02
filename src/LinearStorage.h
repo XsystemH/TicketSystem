@@ -82,6 +82,10 @@ public:
     vector<int> key = mapping.find(index);
     database.insert(value, key[0]);
   }
+  void modify(INDEX index, VALUE value, int n) {
+    vector<int> key = mapping.find(index);
+    database.insert(value, key[n]);
+  }
   vector<VALUE> find(INDEX index) {
     vector<VALUE> ret;
     vector<int> keys = mapping.find(index);

@@ -242,7 +242,7 @@ TICKET get_ticket(std::string s1, std::string s2, const STATION& fr, const STATI
   new_ticket.from = s1;
   new_ticket.dest = s2;
   new_ticket.leaving = day + fr.leaving.get_time();
-  new_ticket.arriving = day - fr.leaving.get_date() + to.arriving;
+  new_ticket.arriving = new_ticket.leaving - fr.leaving + to.arriving;
   new_ticket.cost = to.cost - fr.cost;
   vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(day - fr.leaving.get_date(), fr.trainID.get_hashcode()));
   new_ticket.seat = dt[0].query_seat(fr.rank, to.rank);
@@ -424,7 +424,8 @@ std::string buy_ticket(CMD& cmd) {
   new_order.dest = train[0].stations[to.rank];
   new_order.to_rank = to.rank;
   new_order.leaving = date + fr.leaving.get_time();
-  new_order.arriving = date - fr.leaving.get_date() + to.arriving;
+  new_order.arriving = new_order.leaving - fr.leaving + to.arriving;
+  new_order.arriving = new_order.leaving - fr.leaving + to.arriving;
   new_order.cost = train[0].cost[to.rank] - train[0].cost[fr.rank];
   new_order.seat = need;
   if (need <= day[0].query_seat(fr.rank, to.rank)) {
@@ -448,6 +449,7 @@ std::string buy_ticket(CMD& cmd) {
 }
 
 std::string query_order(CMD& cmd) {
+  if (LoginStack.find(get_hashcode(cmd.cmd['u' - 'a'])) == LoginStack.end()) return "-1";
   std::string ret;
   vector<ORDER> orders = Order.find(get_hashcode(cmd.cmd['u' - 'a']));
   ret += std::to_string(orders.size());
@@ -464,10 +466,12 @@ std::string refund_ticket(CMD& cmd) {
   if (orders.empty()) return "-1";
   int n = 0;
   if (!cmd.cmd['n'- 'a'].empty()) n = orders.size() - to_num(cmd.cmd['n'- 'a']);
+  if (n < 0) return "-1";
+
   if (orders[n].status) { // not success
     if (orders[n].status == 1) Pending.erase(std::make_pair(orders[n].trainID.get_hashcode(), orders[n].date), orders[n]);
     orders[n].status = 2;
-    Order.modify(orders[n].userID.get_hashcode(), orders[n]);
+    Order.modify(orders[n].userID.get_hashcode(), orders[n], n);
     return "0";
   }
   vector<DAYTRAIN> dt = DayTrain.find(std::make_pair(orders[n].date, orders[n].trainID.get_hashcode()));
@@ -476,14 +480,14 @@ std::string refund_ticket(CMD& cmd) {
   for (int i = 0; i < pending.size(); ++i) {
     if (pending[i].seat <= dt[0].query_seat(pending[i].fr_rank, pending[i].to_rank)) {
       dt[0].modify_seat(pending[i].fr_rank, pending[i].to_rank, -pending[i].seat);
-      Pending.erase(std::make_pair(orders[n].trainID.get_hashcode(), orders[n].date), pending[i]);
+      Pending.erase(std::make_pair(pending[i].trainID.get_hashcode(), pending[i].date), pending[i]);
       pending[i].status = 0;
-      Order.modify(pending[i].userID.get_hashcode(), pending[i]);
+      Order.modify(pending[i].userID.get_hashcode(), pending[i], i);
     }
   }
   DayTrain.modify(std::make_pair(orders[n].date, orders[n].trainID.get_hashcode()), dt[0]);
   orders[n].status = 2;
-  Order.modify(orders[n].userID.get_hashcode(), orders[n]);
+  Order.modify(orders[n].userID.get_hashcode(), orders[n], n);
   return "0";
 }
 #endif //TICKETSYSTEM_CORE_H
