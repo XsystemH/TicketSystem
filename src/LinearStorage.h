@@ -80,7 +80,23 @@ public:
   }
   void modify(INDEX index, VALUE value) {
     vector<int> key = mapping.find(index);
-    database.insert(value, key[0]);
+    if (key.size() == 1) {
+      database.insert(value, key[0]);
+      return;
+    }
+  }
+  void modify_(INDEX index, VALUE value) {
+    vector<int> key = mapping.find(index);
+    if (key.size() == 1) {
+      database.insert(value, key[0]);
+      return;
+    }
+    for (int i = 0; i < key.size(); ++i) {
+      if (database.read(key[i]) == value) {
+        database.insert(value, key[i]);
+        return;
+      }
+    }
   }
   void modify(INDEX index, VALUE value, int n) {
     vector<int> key = mapping.find(index);

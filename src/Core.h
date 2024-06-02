@@ -470,6 +470,7 @@ std::string refund_ticket(CMD& cmd) {
 
   if (orders[n].status) { // not success
     if (orders[n].status == 1) Pending.erase(std::make_pair(orders[n].trainID.get_hashcode(), orders[n].date), orders[n]);
+    else return "-1";
     orders[n].status = 2;
     Order.modify(orders[n].userID.get_hashcode(), orders[n], n);
     return "0";
@@ -482,7 +483,7 @@ std::string refund_ticket(CMD& cmd) {
       dt[0].modify_seat(pending[i].fr_rank, pending[i].to_rank, -pending[i].seat);
       Pending.erase(std::make_pair(pending[i].trainID.get_hashcode(), pending[i].date), pending[i]);
       pending[i].status = 0;
-      Order.modify(pending[i].userID.get_hashcode(), pending[i], i);
+      Order.modify_(pending[i].userID.get_hashcode(), pending[i]);
     }
   }
   DayTrain.modify(std::make_pair(orders[n].date, orders[n].trainID.get_hashcode()), dt[0]);

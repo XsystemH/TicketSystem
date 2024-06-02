@@ -686,7 +686,7 @@ struct ORDER {
   friend bool operator>(ORDER& o1, ORDER& o2) {
     return o1.rank > o2.rank;
   }
-  friend bool operator==(ORDER& o1, ORDER& o2) {
+  friend bool operator==(const ORDER& o1, const ORDER& o2) {
     return o1.rank == o2.rank;
   }
 };
