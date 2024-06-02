@@ -107,9 +107,10 @@ std::string modify_profile(CMD& cmd) {
   if (!cmd.cmd['p' - 'a'].empty()) user[0].password = cmd.cmd['p' - 'a'];
   if (!cmd.cmd['n' - 'a'].empty()) user[0].name = cmd.cmd['n' - 'a'];
   if (!cmd.cmd['m' - 'a'].empty()) user[0].mailAddr = cmd.cmd['m' - 'a'];
-  if (!cmd.cmd['g' - 'a'].empty()) user[0].privilege = to_num(cmd.cmd['g' - 'a']);
-
-  if (user[0].privilege >= LoginStack[cur]) return "-1";
+  if (!cmd.cmd['g' - 'a'].empty()) {
+    user[0].privilege = to_num(cmd.cmd['g' - 'a']);
+    if (user[0].privilege >= LoginStack[cur]) return "-1";
+  }
 
   Users.modify(user[0].username.get_hashcode(), user[0]);
   if (LoginStack.find(user[0].username.get_hashcode()) != LoginStack.end())
