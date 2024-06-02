@@ -303,6 +303,11 @@ public:
 	vector() : start(0), finish(0), end_of_storage(0) {}
 	vector(const vector &other)
   {
+    if (other.empty()) {
+      finish = start = alloc.allocate(other.space());
+      end_of_storage = start + other.space();
+      return;
+    }
     finish = start = alloc.allocate(other.space());
     for (iterator copy = other.begin(); copy != other.end(); copy++)
     {
@@ -342,12 +347,12 @@ public:
 	 */
 	T & at(const size_t &pos)
   {
-    if (pos >= size()) throw index_out_of_bound();
+    if (pos >= size()) throw std::runtime_error("Error_at(at)  " + std::to_string(pos) + ',' + std::to_string(size()));
     return *(start + pos);
   }
 	const T & at(const size_t &pos) const
   {
-    if (pos >= size()) throw index_out_of_bound();
+    if (pos >= size()) throw std::runtime_error("Error_at(at)  " + std::to_string(pos) + ',' + std::to_string(size()));
     return *(start + pos);
   }
 	/**
@@ -358,12 +363,12 @@ public:
 	 */
 	T & operator[](const size_t &pos)
   {
-    if (pos >= size()) throw index_out_of_bound();
+    if (pos >= size()) throw std::runtime_error("Error_at[]  " + std::to_string(pos) + ',' + std::to_string(size()));
     return *(start + pos);
   }
 	const T & operator[](const size_t &pos) const
   {
-    if (pos >= size()) throw index_out_of_bound();
+    if (pos >= size()) throw std::runtime_error("Error_at[]  " + std::to_string(pos) + ',' + std::to_string(size()));
     return *(start + pos);
   }
 	/**
@@ -437,7 +442,7 @@ public:
 	 */
 	iterator insert(const size_t &ind, const T &value)
   {
-    if (ind > size()) throw index_out_of_bound();
+    if (ind > size()) throw std::runtime_error("Error_at(insert)  " + std::to_string(ind) + ',' + std::to_string(size()));
     iterator pos = begin();
     pos += ind - 1;
     insert_aux(pos, value);
@@ -492,7 +497,7 @@ public:
 	 */
 	iterator erase(const size_t &ind)
   {
-    if (ind >= size()) throw index_out_of_bound();
+    if (ind >= size()) throw std::runtime_error("Error_at(erase)  " + std::to_string(ind) + ',' + std::to_string(size()));
     iterator pos = begin();
     pos += ind - 1;
     copy_forward(pos + 1, finish - 1, pos);

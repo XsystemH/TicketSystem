@@ -209,7 +209,7 @@ public:
     ans += min;
     return ans;
   } // 计算时 统一到分钟 便于比较
-  std::string string_date() {
+  std::string string_date() const {
     std::string s;
     s = "00-00";
     s[0] = char(mon / 10 + '0');
@@ -218,7 +218,7 @@ public:
     s[4] = char(day % 10 + '0');
     return s;
   }
-  std::string string_time() {
+  std::string string_time() const {
     std::string s;
     s = "00:00";
     s[0] = char(hou / 10 + '0');
@@ -243,7 +243,7 @@ public:
     time.min = min;
     return time;
   }
-  TIME(std::string &s) {
+  TIME(const std::string &s) {
     if (s[2] == '-') {
       mon = (s[0] - '0') * 10 + s[1] - '0';
       day = (s[3] - '0') * 10 + s[4] - '0';
@@ -304,9 +304,17 @@ public:
     t.min %= 60;
     t.day += t.hou / 24;
     t.hou %= 24;
-    if ((t.day >= 31 && t.mon == 6) || (t.day >= 32 && t.mon == 7) || (t.day == 32 && t.mon == 8)) {
+    if (t.day >= 31 && t.mon == 6) {
       ++t.mon;
-      t.day = 1;
+      t.day -= 30;
+    }
+    if (t.day >= 32 && t.mon == 7) {
+      ++t.mon;
+      t.day -= 31;
+    }
+    if (t.day >= 32 && t.mon == 8) {
+      ++t.mon;
+      t.day -= 31;
     }
     return t;
   }
@@ -628,6 +636,26 @@ bool comp_time(const TICKET& t1, const TICKET& t2) {
 bool comp_cost(const TICKET& t1, const TICKET& t2) {
   if (t1.cost != t2.cost) return t1.cost < t2.cost;
   return t1.trainID < t2.trainID;
+}
+
+bool comp_time_sum(const std::pair<TICKET, TICKET>& t1, const std::pair<TICKET, TICKET>& t2) {
+  if (t1.first.cost + t1.second.cost != t2.first.cost + t2.second.cost)
+    return t1.first.cost + t1.second.cost < t2.first.cost + t2.second.cost;
+  if ((t1.second.arriving - t1.first.leaving) != (t2.second.arriving - t2.first.leaving))
+    return (t1.second.arriving - t1.first.leaving) < (t2.second.arriving - t2.first.leaving);
+  if (t1.first.trainID.get_hashcode() != t2.first.trainID.get_hashcode())
+    return t1.first.trainID < t2.first.trainID;
+  else return t1.second.trainID < t2.second.trainID;
+};
+
+bool comp_cost_sum(const std::pair<TICKET, TICKET>& t1, const std::pair<TICKET, TICKET>& t2) {
+  if (t1.first.cost + t1.second.cost != t2.first.cost + t2.second.cost)
+    return t1.first.cost + t1.second.cost < t2.first.cost + t2.second.cost;
+  if ((t1.second.arriving - t1.first.leaving) != (t2.second.arriving - t2.first.leaving))
+    return (t1.second.arriving - t1.first.leaving) < (t2.second.arriving - t2.first.leaving);
+  if (t1.first.trainID.get_hashcode() != t2.first.trainID.get_hashcode())
+    return t1.first.trainID < t2.first.trainID;
+  else return t1.second.trainID < t2.second.trainID;
 }
 
 std::string Status[3] = {"[success]", "[pending]", "[refunded]"};
