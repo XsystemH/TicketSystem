@@ -327,8 +327,6 @@ std::string query_transfer(CMD& cmd) {
   if (cmd.cmd['p' - 'a'] == "time") comp = true;
   else comp = false;
   vector<std::pair<TICKET, TICKET>> ticket;
-  bool flag = true;
-  sjtu::map<hashcode, vector<TICKET>> reachable;
   for (int i = 0; i < fr.size(); ++i) {
     if (day < (fr[i].sDate + fr[i].leaving).get_date() || (fr[i].eDate + fr[i].leaving).get_date() < day) continue;
     vector<TRAININFO> train = Trains.find(fr[i].trainID.get_hashcode());
