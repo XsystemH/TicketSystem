@@ -8,6 +8,9 @@
 int main() {
 //  freopen("in", "r", stdin);
 //  freopen("out", "w", stdout);
+  std::ios::sync_with_stdio(0),std::cin.tie(0),std::cout.tie(0);
+//取消同步流
+
   CMD cmd;
   while (true) {
     cmd = get_cmd();
