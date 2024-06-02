@@ -219,7 +219,7 @@ std::string query_train(CMD& cmd) {
   std::string ret;
   ret += std::string(train[0].trainID.tid) + " " + train[0].type;
   for (int i = 0; i < train[0].stationNum; ++i) {
-    ret += "\n ";
+    ret += "\n";
     ret += std::string(train[0].stations[i].sta) + " ";
     if (i == 0) ret += "xx-xx xx:xx";
     else ret += (date + train[0].arrivingTime[i]).string_date() + " " + (date + train[0].arrivingTime[i]).string_time();
