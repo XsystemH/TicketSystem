@@ -20,19 +20,19 @@ private:
   void initialize() {
     Line.open(FILE);
     if (!Line.good()) {
-      Line.open(FILE, std::ios::out);
+      Line.open(FILE, std::ios::out | std::ios::binary);
       Line.close();
       Line.open(FILE); // create file
     }
   }
 public:
   Linear() = default;
+  Linear(std::string s) {
+    FILE = s;
+    initialize();
+  }
   ~Linear() {
     Line.close();
-  }
-  void select(std::string s) {
-    FILE = std::move(s);
-    initialize();
   }
   int insert(T t) {
     Line.seekp(0, std::ios::end);
@@ -68,13 +68,11 @@ private:
   Linear<VALUE> database;
   BPT<INDEX, int> mapping;
 public:
-  BBPT(std::string no, std::string in, std::string da) {
-    database.select(da);
-    mapping.select(no, in);
-  }
+  BBPT(std::string no, std::string in, std::string da) : database(da), mapping(no, in) {}
   ~BBPT() = default;
   void insert(INDEX index, VALUE value) {
-    mapping.insert(index, database.insert(value));
+    int p = database.insert(value);
+    mapping.insert(index, p);
   }
   void erase(INDEX index, VALUE value) {
     vector<int> key = mapping.find(index);

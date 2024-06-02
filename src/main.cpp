@@ -11,76 +11,71 @@ int main() {
   CMD cmd;
   while (true) {
     cmd = get_cmd();
-    try {
-      std::cout << cmd.timestamp << " ";
-      if (cmd.type == "add_user") {
-        std::cout << add_user(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "login") {
-        std::cout << login(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "logout") {
-        std::cout << logout(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "query_profile") {
-        std::cout << query_profile(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "modify_profile") {
-        std::cout << modify_profile(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "add_train") {
-        std::cout << add_train(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "delete_train") {
-        std::cout << delete_train(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "release_train") {
-        std::cout << release_train(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "query_train") {
-        std::cout << query_train(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "query_ticket") {
-        std::cout << query_ticket(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "query_transfer") {
-        std::cout << query_transfer(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "buy_ticket") {
-        std::cout << buy_ticket(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "query_order") {
-        std::cout << query_order(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "refund_ticket") {
-        std::cout << refund_ticket(cmd) << std::endl;
-        continue;
-      }
-      if (cmd.type == "clear") {
-        std::cout << "0" << std::endl;
-        clear_all();
-        continue;
-      }
-      if (cmd.type == "exit") {
-        std::cout << "bye" << std::endl;
-        break;
-      }
+    std::cout << cmd.timestamp << " ";
+    if (cmd.type == "add_user") {
+      std::cout << add_user(cmd) << std::endl;
+      continue;
     }
-    catch (...) {
-      std::cerr << "wrong when " << cmd.type << std::endl;
+    if (cmd.type == "login") {
+      std::cout << login(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "logout") {
+      std::cout << logout(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_profile") {
+      std::cout << query_profile(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "modify_profile") {
+      std::cout << modify_profile(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "add_train") {
+      std::cout << add_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "delete_train") {
+      std::cout << delete_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "release_train") {
+      std::cout << release_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_train") {
+      std::cout << query_train(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_ticket") {
+      std::cout << query_ticket(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_transfer") {
+      std::cout << query_transfer(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "buy_ticket") {
+      std::cout << buy_ticket(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "query_order") {
+      std::cout << query_order(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "refund_ticket") {
+      std::cout << refund_ticket(cmd) << std::endl;
+      continue;
+    }
+    if (cmd.type == "clear") {
+      std::cout << "0" << std::endl;
+      clear_all();
+      continue;
+    }
+    if (cmd.type == "exit") {
+      std::cout << "bye" << std::endl;
+      break;
     }
   }
   return 0;

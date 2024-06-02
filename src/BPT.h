@@ -15,8 +15,8 @@
 #include <utility>
 
 using sjtu::vector;
-const int M = 64;
-const int L = 256;
+const int M = 32;
+const int L = 128;
 const int PoolSize = 512;
 
 template<class INDEX, class VALUE>
@@ -797,14 +797,9 @@ private:
 
 public:
   BPT() = default;
-  void select(std::string nod, std::string inf) {
-    NODE = std::move(nod);
-    INFO = std::move(inf);
-    initialize();
-  }
   BPT(std::string nod, std::string inf) {
-    NODE = std::move(nod);
-    INFO = std::move(inf);
+    NODE = nod;
+    INFO = inf;
     initialize();
   }
   ~BPT() {

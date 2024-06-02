@@ -12,10 +12,10 @@
 
 using hashcode = unsigned long long;
 
-const int K = 277;
+const unsigned long long K = 277;
 
 struct UIDTYPE {
-  char uid[21];
+  char uid[21]{};
   int  len = 0;
   hashcode h = 0;
 
@@ -26,7 +26,15 @@ struct UIDTYPE {
       uid[len++] = c;
     }
   }
-  hashcode get_hashcode() {
+  UIDTYPE(const UIDTYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      uid[i] = other.uid[i];
+    }
+    len = other.len;
+    uid[len] = '\0';
+    h = other.h;
+  }
+  hashcode& get_hashcode() {
     return h;
   }
   UIDTYPE& operator=(const UIDTYPE& other) {
@@ -51,7 +59,7 @@ struct UIDTYPE {
 };
 
 struct PWDTYPE {
-  char pwd[31];
+  char pwd[31]{};
   int  len = 0;
   hashcode h = 0;
 
@@ -61,6 +69,14 @@ struct PWDTYPE {
       h = h * K + c;
       pwd[len++] = c;
     }
+  }
+  PWDTYPE(const PWDTYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      pwd[i] = other.pwd[i];
+    }
+    len = other.len;
+    pwd[len] = '\0';
+    h = other.h;
   }
   hashcode get_hashcode() {
     return h;
@@ -81,7 +97,7 @@ struct PWDTYPE {
 };
 
 struct NAMETYPE {
-  char name[21]; // 中文字符存贮
+  char name[21]{}; // 中文字符存贮
   int  len = 0;
   // 仅存贮字符信息 不涉及比较
   NAMETYPE() = default;
@@ -89,6 +105,13 @@ struct NAMETYPE {
     for (char c : s) {
       name[len++] = c;
     }
+  }
+  NAMETYPE(const NAMETYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      name[i] = other.name[i];
+    }
+    len = other.len;
+    name[len] = '\0';
   }
   NAMETYPE& operator=(const NAMETYPE& other) {
     if (this == &other) return *this;
@@ -102,7 +125,7 @@ struct NAMETYPE {
 };
 
 struct MAILTYPE {
-  char mail[31];
+  char mail[31]{};
   int  len = 0;
 
   MAILTYPE() = default;
@@ -110,6 +133,13 @@ struct MAILTYPE {
     for (char c : s) {
       mail[len++] = c;
     }
+  }
+  MAILTYPE(const MAILTYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      mail[i] = other.mail[i];
+    }
+    len = other.len;
+    mail[len] = '\0';
   }
   MAILTYPE& operator=(const MAILTYPE& other) {
     if (this == &other) return *this;
@@ -127,8 +157,16 @@ struct USERINFO {
   PWDTYPE password;
   NAMETYPE name;
   MAILTYPE mailAddr;
-  int  privilege;
+  int  privilege{};
 
+  USERINFO(const USERINFO& other) {
+    username = other.username;
+    password = other.password;
+    name = other.name;
+    mailAddr = other.mailAddr;
+    privilege = other.privilege;
+  }
+  USERINFO() = default;
   friend bool operator<(USERINFO& u1, USERINFO& u2) {
     return u1.username < u2.username;
   }
@@ -233,6 +271,12 @@ public:
     hou = 0;
     min = 0;
   }
+  TIME(const TIME& other) {
+    mon = other.mon;
+    day = other.day;
+    hou = other.hou;
+    min = other.min;
+  }
   TIME& operator=(const TIME& other) = default;
   friend bool operator<(const TIME& d1, const TIME& d2) {
     return int(d1) < int(d2);
@@ -276,7 +320,7 @@ public:
 };
 
 struct TIDTYPE {
-  char tid[21];
+  char tid[21]{};
   int  len = 0;
   hashcode h = 0;
 
@@ -286,6 +330,14 @@ struct TIDTYPE {
       h = h * K + c;
       tid[len++] = c;
     }
+  }
+  TIDTYPE(const TIDTYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      tid[i] = other.tid[i];
+    }
+    len = other.len;
+    tid[len] = '\0';
+    h = other.h;
   }
   hashcode get_hashcode() const {
     return h;
@@ -314,7 +366,7 @@ struct TIDTYPE {
 };
 
 struct STATYPE {
-  char sta[41];
+  char sta[41]{};
   int  len = 0;
   hashcode h = 0;
 
@@ -324,6 +376,14 @@ struct STATYPE {
       h = h * K + c;
       sta[len++] = c;
     }
+  }
+  STATYPE(const STATYPE& other) {
+    for (int i = 0; i < len; ++i) {
+      sta[i] = other.sta[i];
+    }
+    len = other.len;
+    sta[len] = '\0';
+    h = other.h;
   }
   hashcode get_hashcode() {
     return h;
@@ -376,15 +436,15 @@ struct TRAININFO_RAW {
 // use to find transfer
 struct TRAININFO {
   TIDTYPE trainID;
-  int  stationNum;
-  int  seatNum;
+  int  stationNum{};
+  int  seatNum{};
   STATYPE stations[100];
-  int cost[100];
+  int cost[100]{};
   TIME sDate, eDate;
   TIME arrivingTime[100]; // 0-0 based
   TIME leavingTime[100];
-  char type;
-  bool pub;
+  char type{};
+  bool pub{};
 
   TRAININFO(TRAININFO_RAW& t) {
     trainID = t.trainID;
@@ -405,6 +465,21 @@ struct TRAININFO {
     type = t.type;
     pub = false;
   }
+  TRAININFO(const TRAININFO& other) {
+    trainID = other.trainID;
+    stationNum = other.stationNum;
+    seatNum = other.seatNum;
+    for (int i = 0; i < stationNum; ++i) {
+      stations[i] = other.stations[i];
+      cost[i] = other.cost[i];
+      arrivingTime[i] = other.arrivingTime[i];
+      leavingTime[i] = other.leavingTime[i];
+    }
+    sDate = other.sDate;
+    eDate = other.eDate;
+    pub = other.pub;
+    type = other.type;
+  }
   TRAININFO() = default;
 
   friend bool operator<(TRAININFO& t1, TRAININFO& t2) {
@@ -420,8 +495,8 @@ struct TRAININFO {
 
 struct STATION {
   TIDTYPE trainID;
-  int cost; // from start station
-  int rank; // n th in the road of the train
+  int cost{}; // from start station
+  int rank{}; // n th in the road of the train
   TIME sDate, eDate;
   TIME arriving, leaving;
 
@@ -434,6 +509,15 @@ struct STATION {
     eDate = train.eDate;
     arriving = train.arrivingTime[i];
     leaving = train.leavingTime[i];
+  }
+  STATION(const STATION& other) {
+    trainID = other.trainID;
+    cost = other.cost; // from start station
+    rank = other.rank; // n th in the road of the train
+    sDate = other.sDate;
+    eDate = other.eDate;
+    arriving = other.arriving;
+    leaving = other.leaving;
   }
 
   friend bool operator<(STATION& s1, STATION& s2) {
@@ -449,8 +533,8 @@ struct STATION {
 
 // Seat of <DATE, Tid>
 struct DAYTRAIN {
-  int num;
-  int seat[100];
+  int num{};
+  int seat[100]{};
 
   int query_seat(int l, int r) {
     int ans = INT32_MAX;
@@ -471,6 +555,12 @@ struct DAYTRAIN {
       seat[i] = x;
     }
   }
+  DAYTRAIN(const DAYTRAIN& other) {
+    num = other.num;
+    for (int i = 0; i < 100; ++i) {
+      seat[i] = other.seat[i];
+    }
+  }
 
   friend bool operator<(DAYTRAIN& dt1, DAYTRAIN& dt2) {
     return dt1.num < dt2.num;
@@ -489,9 +579,19 @@ struct TICKET {
   STATYPE dest;
   TIME leaving;
   TIME arriving;
-  int cost;
-  int seat;
+  int cost{};
+  int seat{};
 
+  TICKET(const TICKET& other) {
+    trainID = other.trainID;
+    from = other.from;
+    dest = other.dest;
+    leaving = other.leaving;
+    arriving = other.arriving;
+    cost = other.cost;
+    seat = other.seat;
+  }
+  TICKET() = default;
   std::string show() {
     std::string s;
     s += std::string(trainID.tid);
@@ -522,20 +622,36 @@ bool comp_cost(const TICKET& t1, const TICKET& t2) {
 std::string Status[3] = {"[success]", "[pending]", "[refunded]"};
 
 struct ORDER {
-  int rank;
+  int rank{};
   UIDTYPE userID;
   TIDTYPE trainID;
   TIME date; // 出发日期
   STATYPE from;
-  int fr_rank;
+  int fr_rank{};
   STATYPE dest;
-  int to_rank;
+  int to_rank{};
   TIME leaving;
   TIME arriving;
-  int cost;
-  int seat;
-  int status; // 0 success 1 pending 2 refunded
+  int cost{};
+  int seat{};
+  int status{}; // 0 success 1 pending 2 refunded
 
+  ORDER(const ORDER& other) {
+    rank = other.rank;
+    userID = other.userID;
+    trainID = other.trainID;
+    date = other.date; // 出发日期
+    from = other.from;
+    fr_rank = other.fr_rank;
+    dest = other.dest;
+    to_rank = other.to_rank;
+    leaving = other.leaving;
+    arriving = other.arriving;
+    cost = other.cost;
+    seat = other.seat;
+    status = other.status;
+  }
+  ORDER() = default;
   std::string show() {
     std::string s;
     s += Status[status];
