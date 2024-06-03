@@ -19,8 +19,8 @@ using sjtu::vector;
 template<class INDEX, class VALUE>
 class BPT {
 private:
-  static const int M = 64;
-  static const int L = 256;
+  static const int M = 32;
+  static const int L = 128;
   static const int PoolSize = 512;
 
   int root; // towards the pos of root in file NODE
