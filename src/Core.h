@@ -295,17 +295,18 @@ std::string query_ticket(CMD& cmd) {
   if (fr.empty()) return "0";
   vector<STATION> to = Station.find(hash_t);
   if (to.empty()) return "0";
+  sjtu::map<hashcode, STATION> to_list;
+  for (int i = 0; i < to.size(); ++i) {
+    to_list.insert(sjtu::pair(to[i].trainID.get_hashcode(), to[i]));
+  }
 
   TIME day(cmd.cmd['d' - 'a']); // 站点日期(非始发站)
   vector<TICKET> tickets;
   for (int i = 0; i < fr.size(); ++i) {
     if (day < (fr[i].sDate + fr[i].leaving).get_date() || (fr[i].eDate + fr[i].leaving).get_date() < day) continue;
-    for (int j = 0; j < to.size(); ++j) {
-//      if (day < to[j].sDate || to[j].eDate < day) continue; 到达时间不可控 仅需判断到达是否为同车次
-      if (fr[i].trainID == to[j].trainID && fr[i].rank < to[j].rank) {
-        tickets.push_back(get_ticket(cmd.cmd['s' - 'a'], cmd.cmd['t' - 'a'], fr[i], to[j], day));
-      }
-    }
+    if (to_list.find(fr[i].trainID.get_hashcode()) == to_list.end()) continue;
+    STATION to_ = to_list[fr[i].trainID.get_hashcode()];
+    if (fr[i].rank < to_.rank) tickets.push_back(get_ticket(cmd.cmd['s' - 'a'], cmd.cmd['t' - 'a'], fr[i], to_, day));
   }
   if (tickets.empty()) {
     return "0";
