@@ -9,15 +9,7 @@
 #include <iostream>
 #include <string>
 
-const int MaxValueNum[16] = {
-  6, 2, 1, 2, 6, 8, 1, 1, 2, 4, 4, 7, 1, 2, 0, 0
-};
-
-const int MinValueNum[16] = {
-  6, 2, 1, 2, 2, 8, 1, 1, 2, 3, 3, 6, 1, 1, 0, 0
-};
-
-CMD process(std::string &s) {
+CMD process(const std::string &s) {
   CMD cmd;
   std::istringstream input(s);
   std::string CmdType, CmdValue;

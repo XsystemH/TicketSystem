@@ -94,6 +94,11 @@ std::string modify_profile(CMD& cmd) {
   hashcode cur = UIDTYPE(cmd.cmd['c' - 'a']).get_hashcode();
   if (LoginStack.find(cur) == LoginStack.end()) return "-1";
   // -c 已登录
+  int privilege;
+  if (!cmd.cmd['g' - 'a'].empty()) {
+    privilege = to_num(cmd.cmd['g' - 'a']);
+    if (privilege >= LoginStack[cur]) return "-1";
+  }
   vector<USERINFO> user = Users.find(get_hashcode(cmd.cmd['u' - 'a']));
   if (user.empty()) return "-1";
   // -u 存在
@@ -107,10 +112,7 @@ std::string modify_profile(CMD& cmd) {
   if (!cmd.cmd['p' - 'a'].empty()) user[0].password = cmd.cmd['p' - 'a'];
   if (!cmd.cmd['n' - 'a'].empty()) user[0].name = cmd.cmd['n' - 'a'];
   if (!cmd.cmd['m' - 'a'].empty()) user[0].mailAddr = cmd.cmd['m' - 'a'];
-  if (!cmd.cmd['g' - 'a'].empty()) {
-    user[0].privilege = to_num(cmd.cmd['g' - 'a']);
-    if (user[0].privilege >= LoginStack[cur]) return "-1";
-  }
+  if (!cmd.cmd['g' - 'a'].empty()) user[0].privilege = privilege;
 
   Users.modify(user[0].username.get_hashcode(), user[0]);
   if (LoginStack.find(user[0].username.get_hashcode()) != LoginStack.end())
@@ -120,28 +122,22 @@ std::string modify_profile(CMD& cmd) {
 
 // Train
 
-vector<std::string> divide_string(std::string s) {
-  for (char &c : s) {
-    if (c == '|') c = ' ';
-  }
+vector<std::string> divide_string(const std::string& s) {
   std::istringstream is(s);
   vector<std::string> ans;
   std::string t;
-  while (is >> t) {
+  while (std::getline(is, t, '|')) {
     ans.push_back(t);
   }
   return ans;
 }
 
-vector<int> divide_num(std::string s) {
-  for (char &c : s) {
-    if (c == '|') c = ' ';
-  }
+vector<int> divide_num(const std::string& s) {
   std::istringstream is(s);
   vector<int> ans;
-  int t;
-  while (is >> t) {
-    ans.push_back(t);
+  std::string t;
+  while (std::getline(is, t, '|')) {
+    ans.push_back(to_num(t));
   }
   return ans;
 }
@@ -240,7 +236,7 @@ std::string query_train(CMD& cmd) {
   return ret;
 }
 
-TICKET get_ticket(const std::string s1, const std::string s2, const STATION& fr, const STATION& to, const TIME day) {
+TICKET get_ticket(const std::string& s1, const std::string& s2, const STATION& fr, const STATION& to, const TIME& day) {
   TICKET new_ticket;
   new_ticket.trainID = fr.trainID;
   new_ticket.from = s1;
@@ -253,7 +249,7 @@ TICKET get_ticket(const std::string s1, const std::string s2, const STATION& fr,
   return new_ticket;
 }
 
-vector<TICKET> query_ticket(std::string s, std::string t, TIME d) {
+vector<TICKET> query_ticket(const std::string& s, const std::string& t, const TIME& d) {
   vector<TICKET> ans;
   if (get_hashcode(s) == get_hashcode(t))
     return ans;

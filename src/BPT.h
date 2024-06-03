@@ -15,14 +15,13 @@
 #include <utility>
 
 using sjtu::vector;
+const int M = 32;
+const int L = 128;
+const int PoolSize = 512;
 
 template<class INDEX, class VALUE>
 class BPT {
 private:
-  static const int M = 32;
-  static const int L = 128;
-  static const int PoolSize = 512;
-
   int root; // towards the pos of root in file NODE
   std::string NODE, INFO;
   std::fstream Node;
