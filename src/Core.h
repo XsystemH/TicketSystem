@@ -65,15 +65,16 @@ std::string login(CMD& cmd) {
   // 用户不存在
   if (!(user[0].password == PWDTYPE(cmd.cmd['p' - 'a']))) return "-1";
   // 密码错误
-  if (LoginStack.find(get_hashcode(cmd.cmd['u' - 'a'])) != LoginStack.end()) return "-1";
+  if (LoginStack.find(user[0].username.get_hashcode()) != LoginStack.end()) return "-1";
   // 用户已经登录
   LoginStack.insert(sjtu::pair(user[0].username.get_hashcode(), user[0].privilege));
   return "0";
 }
 
 std::string logout(CMD& cmd) {
-  if (LoginStack.find(get_hashcode(cmd.cmd['u' - 'a'])) == LoginStack.end()) return "-1";
-  LoginStack.erase(get_hashcode(cmd.cmd['u' - 'a']));
+  hashcode u = get_hashcode(cmd.cmd['u' - 'a']);
+  if (LoginStack.find(u) == LoginStack.end()) return "-1";
+  LoginStack.erase(u);
   return "0";
 }
 
@@ -180,7 +181,7 @@ std::string delete_train(CMD& cmd) {
   if (train.empty()) return "-1";
   if (train[0].pub)  return "-1";
 
-  Trains.erase(get_hashcode(cmd.cmd['i' - 'a']), train[0]);
+  Trains.erase(train[0].trainID.get_hashcode(), train[0]);
   return "0";
 }
 
@@ -251,11 +252,13 @@ TICKET get_ticket(const std::string& s1, const std::string& s2, const STATION& f
 
 vector<TICKET> query_ticket(const std::string& s, const std::string& t, const TIME& d) {
   vector<TICKET> ans;
-  if (get_hashcode(s) == get_hashcode(t))
+  hashcode hash_s = get_hashcode(s);
+  hashcode hash_t = get_hashcode(t);
+  if (hash_s == hash_t)
     return ans;
-  vector<STATION> fr = Station.find(get_hashcode(s));
+  vector<STATION> fr = Station.find(hash_s);
   if (fr.empty()) return ans;
-  vector<STATION> to = Station.find(get_hashcode(t));
+  vector<STATION> to = Station.find(hash_t);
   if (to.empty()) return ans;
 
   vector<TICKET> tickets;
@@ -284,11 +287,13 @@ vector<TICKET> query_ticket(const std::string& s, const std::string& t, const TI
 }
 
 std::string query_ticket(CMD& cmd) {
-  if (get_hashcode(cmd.cmd['s' - 'a']) == get_hashcode(cmd.cmd['t' - 'a']))
+  hashcode hash_s = get_hashcode(cmd.cmd['s' - 'a']);
+  hashcode hash_t = get_hashcode(cmd.cmd['t' - 'a']);
+  if (hash_s == hash_t)
     return "0";
-  vector<STATION> fr = Station.find(get_hashcode(cmd.cmd['s' - 'a']));
+  vector<STATION> fr = Station.find(hash_s);
   if (fr.empty()) return "0";
-  vector<STATION> to = Station.find(get_hashcode(cmd.cmd['t' - 'a']));
+  vector<STATION> to = Station.find(hash_t);
   if (to.empty()) return "0";
 
   TIME day(cmd.cmd['d' - 'a']); // 站点日期(非始发站)
@@ -317,11 +322,13 @@ std::string query_ticket(CMD& cmd) {
 }
 
 std::string query_transfer(CMD& cmd) {
-  if (get_hashcode(cmd.cmd['s' - 'a']) == get_hashcode(cmd.cmd['t' - 'a']))
+  hashcode hash_s = get_hashcode(cmd.cmd['s' - 'a']);
+  hashcode hash_t = get_hashcode(cmd.cmd['t' - 'a']);
+  if (hash_s == hash_t)
     return "0";
-  vector<STATION> fr = Station.find(get_hashcode(cmd.cmd['s' - 'a']));
+  vector<STATION> fr = Station.find(hash_s);
   if (fr.empty()) return "0";
-  vector<STATION> to = Station.find(get_hashcode(cmd.cmd['t' - 'a']));
+  vector<STATION> to = Station.find(hash_t);
   if (to.empty()) return "0";
 
   TIME day(cmd.cmd['d' - 'a']);
@@ -407,9 +414,10 @@ std::string buy_ticket(CMD& cmd) {
 }
 
 std::string query_order(CMD& cmd) {
-  if (LoginStack.find(get_hashcode(cmd.cmd['u' - 'a'])) == LoginStack.end()) return "-1";
+  hashcode u = get_hashcode(cmd.cmd['u' - 'a']);
+  if (LoginStack.find(u) == LoginStack.end()) return "-1";
   std::string ret;
-  vector<ORDER> orders = Order.find(get_hashcode(cmd.cmd['u' - 'a']));
+  vector<ORDER> orders = Order.find(u);
   ret += std::to_string(orders.size());
   if (orders.empty()) return ret;
   for (int i = orders.size() - 1; i >= 0; --i) {
@@ -419,8 +427,9 @@ std::string query_order(CMD& cmd) {
 }
 
 std::string refund_ticket(CMD& cmd) {
-  if (LoginStack.find(get_hashcode(cmd.cmd['u' - 'a'])) == LoginStack.end()) return "-1";
-  vector<ORDER> orders = Order.find(get_hashcode(cmd.cmd['u' - 'a']));
+  hashcode u = get_hashcode(cmd.cmd['u' - 'a']);
+  if (LoginStack.find(u) == LoginStack.end()) return "-1";
+  vector<ORDER> orders = Order.find(u);
   if (orders.empty()) return "-1";
   int n = 0;
   if (!cmd.cmd['n'- 'a'].empty()) n = orders.size() - to_num(cmd.cmd['n'- 'a']);
