@@ -260,23 +260,27 @@ vector<TICKET> query_ticket(const std::string& s, const std::string& t, const TI
   if (fr.empty()) return ans;
   vector<STATION> to = Station.find(hash_t);
   if (to.empty()) return ans;
+  sjtu::map<hashcode, STATION> to_list;
+  for (int i = 0; i < to.size(); ++i) {
+    to_list.insert(sjtu::pair(to[i].trainID.get_hashcode(), to[i]));
+  }
 
   vector<TICKET> tickets;
   for (int i = 0; i < fr.size(); ++i) {
     if (fr[i].eDate + fr[i].leaving < d) continue;
-    for (int j = 0; j < to.size(); ++j) {
-      if (fr[i].trainID == to[j].trainID && fr[i].rank < to[j].rank) {
+    if (to_list.find(fr[i].trainID.get_hashcode())==to_list.end()) continue;
+    STATION to_ = to_list[fr[i].trainID.get_hashcode()];
+    if (fr[i].rank < to_.rank) {
 //        std::cout << std::string(fr[i].trainID.tid) << " " << (fr[i].eDate + fr[i].leaving).string_date() << " " << (fr[i].eDate + fr[i].leaving).string_time() << " ";
-        TIME day(d);
-        if (d < fr[i].sDate + fr[i].leaving) {
-          tickets.push_back(get_ticket(s, t, fr[i], to[j], (fr[i].sDate + fr[i].leaving).get_date()));
-        }
-        else if (fr[i].leaving.get_time() < day.get_time()) {
-          ++day;
-          tickets.push_back(get_ticket(s, t, fr[i], to[j], day.get_date()));
-        }
-        else tickets.push_back(get_ticket(s, t, fr[i], to[j], d.get_date()));
+      TIME day(d);
+      if (d < fr[i].sDate + fr[i].leaving) {
+        tickets.push_back(get_ticket(s, t, fr[i], to_, (fr[i].sDate + fr[i].leaving).get_date()));
       }
+      else if (fr[i].leaving.get_time() < day.get_time()) {
+        ++day;
+        tickets.push_back(get_ticket(s, t, fr[i], to_, day.get_date()));
+      }
+      else tickets.push_back(get_ticket(s, t, fr[i], to_, d.get_date()));
     }
   }
   if (tickets.empty()) {
