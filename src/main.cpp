@@ -16,68 +16,68 @@ int main() {
     cmd = get_cmd();
     std::cout << cmd.timestamp << " ";
     if (cmd.type == "add_user") {
-      std::cout << add_user(cmd) << std::endl;
+      std::cout << add_user(cmd) << "\n";
       continue;
     }
     if (cmd.type == "login") {
-      std::cout << login(cmd) << std::endl;
+      std::cout << login(cmd) << "\n";
       continue;
     }
     if (cmd.type == "logout") {
-      std::cout << logout(cmd) << std::endl;
+      std::cout << logout(cmd) << "\n";
       continue;
     }
     if (cmd.type == "query_profile") {
-      std::cout << query_profile(cmd) << std::endl;
+      std::cout << query_profile(cmd) << "\n";
       continue;
     }
     if (cmd.type == "modify_profile") {
-      std::cout << modify_profile(cmd) << std::endl;
+      std::cout << modify_profile(cmd) << "\n";
       continue;
     }
     if (cmd.type == "add_train") {
-      std::cout << add_train(cmd) << std::endl;
+      std::cout << add_train(cmd) << "\n";
       continue;
     }
     if (cmd.type == "delete_train") {
-      std::cout << delete_train(cmd) << std::endl;
+      std::cout << delete_train(cmd) << "\n";
       continue;
     }
     if (cmd.type == "release_train") {
-      std::cout << release_train(cmd) << std::endl;
+      std::cout << release_train(cmd) << "\n";
       continue;
     }
     if (cmd.type == "query_train") {
-      std::cout << query_train(cmd) << std::endl;
+      std::cout << query_train(cmd) << "\n";
       continue;
     }
     if (cmd.type == "query_ticket") {
-      std::cout << query_ticket(cmd) << std::endl;
+      std::cout << query_ticket(cmd) << "\n";
       continue;
     }
     if (cmd.type == "query_transfer") {
-      std::cout << query_transfer(cmd) << std::endl;
+      std::cout << query_transfer(cmd) << "\n";
       continue;
     }
     if (cmd.type == "buy_ticket") {
-      std::cout << buy_ticket(cmd) << std::endl;
+      std::cout << buy_ticket(cmd) << "\n";
       continue;
     }
     if (cmd.type == "query_order") {
-      std::cout << query_order(cmd) << std::endl;
+      std::cout << query_order(cmd) << "\n";
       continue;
     }
     if (cmd.type == "refund_ticket") {
-      std::cout << refund_ticket(cmd) << std::endl;
+      std::cout << refund_ticket(cmd) << "\n";
       continue;
     }
     if (cmd.type == "clear") {
-      std::cout << "0" << std::endl;
+      std::cout << "0" << "\n";
       clear_all();
       continue;
     }
     if (cmd.type == "exit") {
-      std::cout << "bye" << std::endl;
+      std::cout << "bye" << "\n";
       break;
     }
   }
